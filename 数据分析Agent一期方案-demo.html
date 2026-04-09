@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据分析 Agent 一期方案 v10</title>
+<style>
+
+:root{--primary:#2563eb;--primary-light:#dbeafe;--primary-dark:#1e40af;--success:#16a34a;--success-light:#dcfce7;--warning:#d97706;--warning-light:#fef3c7;--danger:#dc2626;--danger-light:#fee2e2;--purple:#7c3aed;--purple-light:#ede9fe;--teal:#0d9488;--teal-light:#ccfbf1;--orange:#ea580c;--orange-light:#fff7ed;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;--radius:8px;--shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;color:var(--gray-800);background:var(--gray-50);line-height:1.7;font-size:15px}
+.page-container{max-width:95%;margin:0 auto;padding:40px 24px}
+.cover{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 40%,#2563eb 100%);color:#fff;padding:80px 48px;border-radius:16px;margin-bottom:48px;position:relative;overflow:hidden;word-wrap:break-word}
+.cover::before{content:'';position:absolute;top:-50%;right:-20%;width:500px;height:500px;border-radius:50%;background:rgba(255,255,255,.04)}
+.cover h1{font-size:36px;font-weight:700;margin-bottom:8px;position:relative;z-index:1}
+.cover .subtitle{font-size:18px;opacity:.85;margin-bottom:8px;position:relative;z-index:1}
+.cover .version-tag{display:inline-block;padding:4px 14px;border-radius:20px;background:rgba(255,255,255,.15);font-size:13px;margin-bottom:28px;position:relative;z-index:1}
+.cover .meta{display:flex;gap:32px;font-size:14px;opacity:.7;position:relative;z-index:1}
+.toc{background:#fff;border-radius:var(--radius);padding:32px;margin-bottom:48px;box-shadow:var(--shadow)}
+.toc h2{font-size:20px;margin-bottom:20px;color:var(--gray-700)}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.toc-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:var(--radius);background:var(--gray-50);text-decoration:none;color:var(--gray-700);transition:all .15s}
+.toc-item:hover{background:var(--primary-light);color:var(--primary)}
+.toc-num{width:28px;height:28px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.section{background:#fff;border-radius:var(--radius);padding:40px;margin-bottom:32px;box-shadow:var(--shadow);overflow-x:auto}
+.section h2{font-size:24px;color:var(--gray-900);margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid var(--primary);display:flex;align-items:center;gap:12px}
+.section h3{font-size:18px;color:var(--gray-800);margin:28px 0 16px}
+.section h4{font-size:15px;color:var(--gray-700);margin:20px 0 10px;font-weight:600}
+.section p{margin-bottom:14px;color:var(--gray-600)}
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600}
+.badge-primary{background:var(--primary-light);color:var(--primary)}
+.badge-success{background:var(--success-light);color:var(--success)}
+.badge-warning{background:var(--warning-light);color:var(--warning)}
+.badge-danger{background:var(--danger-light);color:var(--danger)}
+.badge-purple{background:var(--purple-light);color:var(--purple)}
+.badge-teal{background:var(--teal-light);color:var(--teal)}
+.badge-orange{background:var(--orange-light);color:var(--orange)}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;overflow-x:auto;display:block;display:table}
+th{background:var(--gray-100);padding:10px 14px;text-align:left;font-weight:600;color:var(--gray-700);border-bottom:2px solid var(--gray-200)}
+td{padding:10px 14px;border-bottom:1px solid var(--gray-100);color:var(--gray-600)}
+tr:hover td{background:var(--gray-50)}
+.callout{padding:16px 20px;border-radius:var(--radius);margin:16px 0;font-size:14px}
+.callout-info{background:var(--primary-light);border-left:4px solid var(--primary)}
+.callout-warning{background:var(--warning-light);border-left:4px solid var(--warning)}
+.callout-success{background:var(--success-light);border-left:4px solid var(--success)}
+.callout-danger{background:var(--danger-light);border-left:4px solid var(--danger)}
+.callout-purple{background:var(--purple-light);border-left:4px solid var(--purple)}
+.callout-teal{background:var(--teal-light);border-left:4px solid var(--teal)}
+.callout-orange{background:var(--orange-light);border-left:4px solid var(--orange)}
+.callout strong{display:block;margin-bottom:4px}
+.flow-container{background:var(--gray-50);border-radius:var(--radius);padding:32px;margin:20px 0;overflow-x:auto}
+.flow-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.flow-node{padding:12px 20px;border-radius:var(--radius);font-size:13px;font-weight:500;text-align:center;min-width:120px;box-shadow:var(--shadow)}
+.flow-node.start{background:var(--primary);color:#fff}
+.flow-node.process{background:#fff;border:2px solid var(--primary);color:var(--primary)}
+.flow-node.decision{background:var(--warning-light);border:2px solid var(--warning);color:#92400e}
+.flow-node.human{background:var(--success-light);border:2px solid var(--success);color:var(--success)}
+.flow-node.output{background:var(--gray-100);border:2px solid var(--gray-400);color:var(--gray-700)}
+.flow-node.auto{background:var(--orange-light);border:2px solid var(--orange);color:var(--orange)}
+.flow-node.context{background:var(--purple-light);border:2px solid var(--purple);color:var(--purple);font-size:12px;padding:8px 14px}
+.flow-arrow{color:var(--gray-400);font-size:18px;flex-shrink:0}
+.flow-arrow.down{display:block;text-align:center;margin:4px 0}
+.flow-label{font-size:11px;color:var(--gray-500);margin:0 4px}
+.flow-branch{display:flex;gap:40px;justify-content:center;margin:12px 0}
+.flow-branch-item{display:flex;flex-direction:column;align-items:center;gap:8px}
+.code-block{background:var(--gray-900);color:#e2e8f0;padding:16px 20px;border-radius:var(--radius);font-family:'SF Mono','Fira Code',monospace;font-size:13px;line-height:1.6;overflow-x:auto;margin:12px 0;white-space:pre-wrap;max-width:100%;word-break:break-word}
+.code-block .comment{color:#64748b}.code-block .key{color:#7dd3fc}.code-block .val{color:#86efac}.code-block .str{color:#fcd34d}
+.ascii-diagram{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius);padding:20px;margin:16px 0;font-family:'SF Mono','Fira Code',monospace;font-size:13px;line-height:1.5;overflow-x:auto;white-space:pre;color:var(--gray-700)}
+.param-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;margin:2px}
+.param-tag.matched{background:var(--success-light);color:var(--success);border:1px solid var(--success)}
+.param-tag.inferred{background:var(--warning-light);color:#92400e;border:1px solid var(--warning)}
+.param-tag.default{background:var(--gray-100);color:var(--gray-500);border:1px solid var(--gray-300)}
+.param-tag.context{background:var(--purple-light);color:var(--purple);border:1px solid var(--purple)}
+.qa-block{border:1px solid var(--gray-200);border-radius:var(--radius);margin:16px 0;overflow:hidden}
+.qa-q{padding:14px 20px;background:var(--gray-50);font-weight:600;color:var(--gray-800);font-size:15px;border-bottom:1px solid var(--gray-200)}
+.qa-a{padding:16px 20px;font-size:14px;color:var(--gray-600)}
+.dim-card{border:1px solid var(--gray-200);border-radius:var(--radius);padding:16px;text-align:center}
+.dim-card .dim-icon{font-size:24px;margin-bottom:8px}
+.dim-card .dim-name{font-weight:700;font-size:14px;margin-bottom:4px}
+.dim-card .dim-desc{font-size:12px;color:var(--gray-500)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:16px 0}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:16px 0}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin:16px 0}
+@media(max-width:900px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.split-layout{grid-template-columns:1fr !important;min-height:auto}.split-right{border-top:1px solid var(--gray-200);border-left:none}.cover{padding:40px 24px}.cover h1{font-size:28px}.section{padding:24px}}
+@media(min-width:1600px){.page-container{max-width:1500px}}
+@media(min-width:1900px){.page-container{max-width:1800px}}
+.skill-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;margin:2px;border:1px solid}
+
+/* Split-pane prototype styles */
+.proto-frame{background:var(--gray-900);border-radius:12px;padding:12px;margin:24px 0}
+.proto-titlebar{display:flex;align-items:center;gap:8px;padding:8px 12px;margin-bottom:8px}
+.proto-dot{width:10px;height:10px;border-radius:50%}
+.proto-dot.red{background:#ff5f57}.proto-dot.yellow{background:#ffbd2e}.proto-dot.green{background:#28c940}
+.proto-title{color:var(--gray-400);font-size:12px;margin-left:8px}
+.proto-content{background:#fff;border-radius:8px;min-height:200px;overflow:hidden}
+.split-layout{display:grid;grid-template-columns:1fr minmax(280px,340px);min-height:440px}
+.split-layout.simple{min-height:260px}
+.split-left{border-right:1px solid var(--gray-200);display:flex;flex-direction:column}
+.split-right{display:flex;flex-direction:column;background:var(--gray-50)}
+.chat-container{padding:16px;flex:1;overflow-y:auto}
+.chat-msg{display:flex;gap:10px;margin:12px 0;align-items:flex-start}
+.chat-msg.user{flex-direction:row-reverse}
+.chat-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.chat-avatar.ai{background:var(--primary);color:#fff}
+.chat-avatar.user{background:var(--gray-300);color:#fff}
+.chat-bubble{max-width:85%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.6}
+.chat-bubble.ai{background:var(--gray-100);color:var(--gray-700)}
+.chat-bubble.user{background:var(--primary);color:#fff}
+.input-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid var(--gray-200);background:#fff}
+.input-field{flex:1;padding:8px 12px;border:1px solid var(--gray-300);border-radius:20px;font-size:13px;outline:none;color:var(--gray-700)}
+.send-btn{width:32px;height:32px;border-radius:50%;background:var(--primary);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px}
+.toggle-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gray-500)}
+.toggle{width:32px;height:18px;border-radius:9px;background:var(--gray-300);position:relative;cursor:pointer;flex-shrink:0}
+.toggle.on{background:var(--primary)}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s}
+.toggle.on::after{transform:translateX(14px)}
+.panel-tabs{display:flex;gap:0;border-bottom:1px solid var(--gray-200);background:#fff}
+.panel-tab{padding:8px 16px;font-size:12px;font-weight:600;color:var(--gray-400);border-bottom:2px solid transparent;cursor:pointer}
+.panel-tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.process-list{padding:8px 12px;flex:1;overflow-y:auto}
+.process-item{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:6px;margin:2px 0;font-size:12px;cursor:pointer;transition:background .15s}
+.process-item:hover{background:var(--gray-100)}
+.process-item.active{background:var(--primary-light)}
+.process-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.process-dot.done{background:var(--success)}
+.process-dot.running{background:var(--warning);animation:pulse 1.5s infinite}
+.process-dot.pending{background:var(--gray-300)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.process-label{font-size:11px;color:var(--gray-400);margin-top:2px}
+.process-time{font-size:10px;color:var(--gray-400);margin-left:auto;flex-shrink:0}
+.process-detail{padding:10px 12px;border-top:1px solid var(--gray-200);background:#fff;font-size:12px}
+.process-detail-title{font-weight:600;color:var(--gray-700);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.process-code{background:var(--gray-900);color:#e2e8f0;padding:8px 10px;border-radius:4px;font-family:'SF Mono',monospace;font-size:11px;line-height:1.5;margin:6px 0;overflow-x:auto}
+.process-data{border:1px solid var(--gray-200);border-radius:4px;overflow:hidden;margin:6px 0}
+.process-data table{margin:0;font-size:11px}
+.process-data th{padding:4px 8px;font-size:10px}
+.process-data td{padding:4px 8px;font-size:11px}
+.artifact-panel{padding:12px;flex:1;overflow-y:auto}
+.artifact-card{border:1px solid var(--gray-200);border-radius:8px;overflow:hidden;margin-bottom:10px;background:#fff}
+.artifact-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--gray-50);border-bottom:1px solid var(--gray-100);font-size:11px;font-weight:600;color:var(--gray-600)}
+.artifact-card-body{padding:10px}
+.mini-bar{display:flex;align-items:flex-end;gap:3px;height:60px;padding:0 4px}
+.mini-bar .bar{width:24px;border-radius:3px 3px 0 0}
+.plan-card{border:1px solid var(--gray-200);border-radius:var(--radius);margin:8px 0;overflow:hidden}
+.plan-card-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--gray-50);flex-wrap:wrap;gap:6px}
+.plan-card-header .title{font-weight:600;color:var(--primary-dark);font-size:13px}
+.plan-card-body{padding:10px 14px}
+.plan-step{display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;color:var(--gray-600)}
+.plan-step .num{width:20px;height:20px;border-radius:50%;background:var(--gray-200);color:var(--gray-600);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
+.step-inline{display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--gray-200);border-radius:6px;margin:4px 0;font-size:12px;color:var(--gray-600);cursor:pointer}
+.step-inline:hover{background:var(--gray-50)}
+.step-inline .step-icon{font-size:14px}
+.step-inline .step-name{font-weight:500;color:var(--gray-700)}
+.step-inline .step-summary{color:var(--gray-400);margin-left:4px}
+.step-inline .step-time{margin-left:auto;font-size:10px;color:var(--gray-400)}
+
+/* Context transparency block */
+.context-block{border:1px solid var(--purple);border-radius:var(--radius);margin:8px 0;overflow:hidden;font-size:12px}
+.context-block-header{display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--purple-light);color:var(--purple);font-weight:600;cursor:pointer}
+.context-block-body{padding:8px 12px;background:#fff;border-top:1px solid var(--purple-light)}
+.context-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;background:var(--purple-light);color:var(--purple);margin:2px;border:1px solid rgba(124,58,237,.2)}
+
+/* Roadmap vision block */
+.vision-block{border:2px dashed var(--teal);border-radius:var(--radius);padding:16px 20px;margin:16px 0;background:var(--teal-light)}
+.vision-block .vision-title{font-size:14px;font-weight:700;color:var(--teal);margin-bottom:8px}
+
+.part-divider{background:linear-gradient(90deg,var(--gray-200) 0%,transparent 100%);padding:20px 32px;margin:48px 0 32px;border-radius:var(--radius)}
+.part-divider h2{font-size:20px;color:var(--gray-700);margin:0;border:none;padding:0}
+.part-divider p{font-size:14px;color:var(--gray-500);margin:4px 0 0}
+
+/* v10: Agent boundary legend & flow */
+.agent-legend{display:flex;gap:20px;flex-wrap:wrap;margin:16px 0;padding:12px 16px;background:var(--gray-50);border-radius:var(--radius);border:1px solid var(--gray-200)}
+.agent-legend-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gray-700)}
+.agent-legend-item .swatch{width:16px;height:16px;border-radius:4px;flex-shrink:0}
+.sys-flow-stage{padding:16px 20px;border-radius:var(--radius);margin:10px 0;border:2px solid;font-size:13px}
+.sys-flow-stage .stage-title{font-weight:700;font-size:14px;margin-bottom:6px}
+.sys-flow-stage .stage-detail{font-size:12px;color:var(--gray-600);line-height:1.7}
+</style>
+</head>
+<body>
+<div class="page-container">
+
+<!-- COVER -->
+<div class="cover">
+  <div class="version-tag">v10.0 — 完整产品方案</div>
+  <h1>数据分析 Agent 一期产品方案</h1>
+  <p class="subtitle">四维迭代：过程透明 · 技能 · 自动化 · 质量保障</p>
+  <div class="meta"><span>luna</span><span>2026-04-09</span><span>v10.0</span></div>
+</div>
+
+<!-- TOC -->
+<div class="toc">
+  <h2>目录</h2>
+
+  <div style="font-size:13px;font-weight:600;color:var(--gray-500);margin:12px 0 8px;text-transform:uppercase;letter-spacing:1px">📋 一期产品方案全览</div>
+  <div class="toc-grid">
+    <a class="toc-item" href="#s1"><span class="toc-num">1</span>一期方案总览</a>
+    <a class="toc-item" href="#s2"><span class="toc-num">2</span>核心功能（四维）</a>
+    <a class="toc-item" href="#s3"><span class="toc-num">3</span>核心流程</a>
+    <a class="toc-item" href="#s4"><span class="toc-num">4</span>迭代规划总览</a>
+    <a class="toc-item" href="#s5"><span class="toc-num">5</span>迭代 A：过程透明 + 基础技能</a>
+    <a class="toc-item" href="#s6"><span class="toc-num">6</span>迭代 B：约束优化 + 技能框架</a>
+    <a class="toc-item" href="#s7"><span class="toc-num">7</span>迭代 C：自动化 + 自动评测</a>
+  </div>
+
+  <div style="font-size:13px;font-weight:600;color:var(--gray-500);margin:20px 0 8px;text-transform:uppercase;letter-spacing:1px">🔧 功能点说明</div>
+  <div class="toc-grid">
+    <a class="toc-item" href="#s8"><span class="toc-num">8</span>过程透明</a>
+    <a class="toc-item" href="#s9"><span class="toc-num">9</span>技能系统</a>
+    <a class="toc-item" href="#s10"><span class="toc-num">10</span>自动化</a>
+    <a class="toc-item" href="#s11"><span class="toc-num">11</span>质量保障</a>
+    <a class="toc-item" href="#s12"><span class="toc-num">12</span>PM 交付物 + 风险</a>
+    <a class="toc-item" href="#s13"><span class="toc-num">13</span>技术框架与二期方向</a>
+  </div>
+</div>
+
+<!-- =========================================================== -->
+<!-- PART 1: 一期产品方案全览 -->
+<!-- =========================================================== -->
+<div class="part-divider">
+  <h2>📋 一期产品方案全览</h2>
+  <p>定位、核心功能、流程、迭代规划与关键原型</p>
+</div>
+
+<!-- S1: 一期方案总览 -->
+<div class="section" id="s1">
+  <h2>1 一期方案总览</h2>
+  <p>一期不接入语义模型和数据模型，由<strong>人工确认分析范围</strong>、<strong>人工确认分析计划</strong>，聚焦搭建 Agent 的<strong>运行骨架、交付能力和沉淀与自动化</strong>。</p>
+</div>
+
+<!-- S2: 核心功能（四维） -->
+<div class="section" id="s2">
+  <h2>2 核心功能（四维）</h2>
+  <p>产品围绕四个维度构建，从「用户看得懂」到「系统跑得好」逐层递进。</p>
+  <div class="grid-4">
+    <div class="dim-card" style="border-color:var(--primary)"><div class="dim-icon">🔄</div><div class="dim-name" style="color:var(--primary)">过程透明</div><div class="dim-desc">让用户看到 Agent 在做什么、为什么这样做</div></div>
+    <div class="dim-card" style="border-color:var(--purple)"><div class="dim-icon">⚡</div><div class="dim-name" style="color:var(--purple)">技能</div><div class="dim-desc">将分析经验沉淀为可复用的结构化能力</div></div>
+    <div class="dim-card" style="border-color:var(--orange)"><div class="dim-icon">🤖</div><div class="dim-name" style="color:var(--orange)">自动化</div><div class="dim-desc">让分析定期运行、异常自动触发、结果自动推送</div></div>
+    <div class="dim-card" style="border-color:var(--teal)"><div class="dim-icon">🛡️</div><div class="dim-name" style="color:var(--teal)">质量保障</div><div class="dim-desc">约束 + 评测 + 反馈闭环，持续驱动分析质量提升</div></div>
+  </div>
+  <table>
+    <tr><th>维度</th><th>解决什么问题</th><th>一期（ABC 三个迭代）做完后能实现什么</th></tr>
+    <tr><td><strong style="color:var(--primary)">过程透明</strong></td><td>用户不信任黑箱结果</td><td>简单/复杂自动分流（用户可切换）；分析计划可查看/确认；分析过程实时可见；交付物三段式 UI呈现（Chat + Process + Artifacts）</td></tr>
+    <tr><td><strong style="color:var(--purple)">技能</strong></td><td>每次分析都从零开始，无法积累</td><td>预制技能 + 用户手选/语义自动匹配调用；从现有报告沉淀技能；技能中心（系统+个人）浏览搜索；可视化技能编辑器</td></tr>
+    <tr><td><strong style="color:var(--orange)">自动化</strong></td><td>重复性分析需要人工触发</td><td>创建自动化任务；定时执行 + 阈值触发（指标越线自动归因）；多渠道推送执行结果</td></tr>
+    <tr><td><strong style="color:var(--teal)">质量保障</strong></td><td>分析质量无法量化和系统性改进</td><td>基础约束 + 评测驱动的规则迭代 ；全量可观测埋点 -> LLM-as-Judge 自动评测标注bad case；根据评测结果持续改进模型约束</td></tr>
+  </table>
+</div>
+
+<!-- S3: 核心流程 -->
+<div class="section" id="s3">
+  <h2>3 核心流程</h2>
+
+  <!-- 3.1 用户主流程 -->
+  <h3>3.1 一期用户主流程</h3>
+  <div class="flow-container" style="padding:20px 12px">
+    <div style="display:flex;align-items:stretch;gap:0;overflow-x:auto">
+      <!-- Step 1 -->
+      <div style="flex:1;min-width:130px;padding:14px 12px;background:rgba(255,255,255,0.70);border:2px solid #DDD;border-radius:8px;text-align:center">
+        <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:6px">产生分析诉求</div>
+        <div style="font-size:11px;color:var(--gray-600);line-height:1.5">业务会议/周报中<br>发现数据异常<br>形成模糊问题</div>
+      </div>
+      <div style="display:flex;align-items:center;padding:0 4px;color:var(--gray-300);font-size:18px">→</div>
+      <!-- Step 2 -->
+      <div style="flex:1;min-width:130px;padding:14px 12px;background:rgba(255,255,255,0.70);border:2px solid #DDD;border-radius:8px;text-align:center">
+        <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:6px">人工指定分析计划</div>
+        <div style="font-size:11px;color:var(--gray-600);line-height:1.5">对齐分析路径</div>
+      </div>
+      <div style="display:flex;align-items:center;padding:0 4px;color:var(--gray-300);font-size:18px">→</div>
+      <!-- Step 3 -->
+      <div style="flex:1;min-width:130px;padding:14px 12px;background:rgba(255,255,255,0.70);border:2px solid #DDD;border-radius:8px;text-align:center">
+        <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:6px">需求沟通对齐</div>
+        <div style="font-size:11px;color:var(--gray-600);line-height:1.5">对齐分析口径（指标/维度）<br>选择看板/模版 视图</div>
+      </div>
+      <div style="display:flex;align-items:center;padding:0 4px;color:var(--gray-300);font-size:18px">→</div>
+      <!-- Step 4 -->
+      <div style="flex:1;min-width:130px;padding:14px 12px;background:var(--orange-light);border:2px solid var(--orange);border-radius:8px;text-align:center">
+        <div style="font-size:13px;font-weight:700;color:var(--orange);margin-bottom:6px">执行分析</div>
+        <div style="font-size:11px;color:var(--gray-600);line-height:1.5">轻量：直接执行<br>深度：确认分析计划后执行<br>执行过程实时可查看</div>
+      </div>
+      <div style="display:flex;align-items:center;padding:0 4px;color:var(--gray-300);font-size:18px">→</div>
+      <!-- Step 5 -->
+      <div style="flex:1;min-width:130px;padding:14px 12px;background:var(--success-light);border:2px solid var(--success);border-radius:8px;text-align:center">
+        <div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:6px">结果交付</div>
+        <div style="font-size:11px;color:var(--gray-600);line-height:1.5">按场景类型输出<br>报告/图表/文件</div>
+      </div>
+      <div style="display:flex;align-items:center;padding:0 4px;color:var(--gray-300);font-size:18px">→</div>
+      <!-- Step 6 -->
+      <div style="flex:1;min-width:130px;padding:14px 12px;background:var(--purple-light);border:2px solid var(--purple);border-radius:8px;text-align:center">
+        <div style="font-size:13px;font-weight:700;color:var(--purple);margin-bottom:6px">沉淀</div>
+        <div style="font-size:11px;color:var(--gray-600);line-height:1.5">创建技能/定时任务<br>根据对话创建技能<br>推送执行结果</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.2 系统视角（双列） -->
+  <h3>3.2 用户视角 + 系统视角</h3>
+
+  <!-- Agent 边界图例 -->
+  <div class="agent-legend">
+    <div class="agent-legend-item"><div class="swatch" style="background:var(--primary);"></div><strong>数据分析 Agent</strong> — 规划 / 执行 / 总结 </div>
+    <div class="agent-legend-item"><div class="swatch" style="background:var(--gray-400);"></div><strong>系统约束（Agent Harness）</strong> — 确定性流程控制、上下文组装、规则校验</div>
+    <div class="agent-legend-item"><div class="swatch" style="background:var(--danger);"></div><strong>质量评估 Agent</strong> 异步离线评分，不参与主流程</div>
+  </div>
+
+  <div class="flow-container" style="padding:20px 12px">
+
+    <!-- 表头 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div style="text-align:center;padding:8px;background:var(--primary);color:#fff;border-radius:6px;font-weight:700;font-size:13px">👤 用户视角</div>
+      <div style="text-align:center;padding:8px;background:var(--gray-700);color:#fff;border-radius:6px;font-weight:700;font-size:13px">⚙️ 系统视角</div>
+    </div>
+
+    <!-- ① 输入阶段 -->
+    <div style="font-size:11px;font-weight:700;color:var(--primary-dark);letter-spacing:1px;margin-bottom:6px">① 输入</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px">
+      <div style="padding:10px 12px;border-radius:6px;background:var(--primary-light);border:1px solid var(--primary);font-size:12px;color:var(--primary)">
+        <strong>选择看板 + 输入问题</strong>
+        <span style="display:block;font-size:11px;margin-top:3px;opacity:.8">可选：指定技能</span>
+      </div>
+      <!-- 1. 系统代码：上下文组装 -->
+      <div style="padding:14px 18px;border-radius:8px;background:var(--gray-100);border:2px solid var(--gray-400)">
+        <div style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:4px">系统代码：上下文组装</div>
+        <div style="font-size:12px;color:var(--gray-500)">获取数据 Schema → 获取数据说明 → 加载约束规则 → 组装为系统指令</div>
+      </div>
+    
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:2px">
+      <div style="font-size:10px;color:var(--gray-400);padding:0 4px"><span class="badge badge-primary" style="font-size:9px">A</span> 技能选择 + 参数匹配 &nbsp; </div>
+      <div style="font-size:10px;color:var(--gray-400);padding:0 4px"><span class="badge badge-primary" style="font-size:9px">A</span> 基础约束 &nbsp; <span class="badge badge-success" style="font-size:9px">B</span> 基于评测补充规则校验 &nbsp; <span class="badge badge-purple" style="font-size:9px">C</span> 自动校验</div>
+    </div>
+
+    <div style="text-align:center;color:var(--gray-300);font-size:14px;padding:4px 0">↓</div>
+
+    <!-- ② 意图分流 + 规划 -->
+    <div style="font-size:11px;font-weight:700;color:var(--primary-dark);letter-spacing:1px;margin-bottom:6px">② 意图分流 + 规划</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="padding:10px 12px;border-radius:6px;background:var(--warning-light);border:1px solid var(--warning);font-size:12px;color:#92400e;text-align:center">
+          <strong>系统判断：轻量 or 深度？</strong> 用户可手动切换
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div style="padding:8px;border-radius:6px;background:var(--teal-light);border:1px solid var(--teal);font-size:11px;color:var(--teal);text-align:center"><strong>轻量</strong><br>直接回答<br><span style="font-size:10px;opacity:.8">附「深入分析→」入口</span></div>
+          <div style="padding:8px;border-radius:6px;background:var(--primary-light);border:1px solid var(--primary);font-size:11px;color:var(--primary);text-align:center"><strong>深度</strong><br>看到分析计划卡片<br><span style="font-size:10px;opacity:.8">可选确认后执行</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="padding:10px 12px;border-radius:6px;background:var(--primary-light);border:2px solid var(--primary);font-size:12px;color:var(--primary)">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--primary);margin-right:4px;vertical-align:middle"></span>
+          <strong>数据分析 Agent：意图理解 + 规划</strong>
+          <span style="display:block;font-size:11px;margin-top:2px;font-weight:400">判断复杂度 → 匹配技能 → 规划步骤</span>
+          <span style="display:block;font-size:10px;margin-top:2px;color:var(--gray-500)">LLM 调用 #1</span>
+        </div>
+        <div style="padding:10px 12px;border-radius:6px;background:#fff;border:1px solid var(--gray-300);font-size:12px;color:var(--gray-700)"><strong>轻量：</strong>直接查数生成回答 &nbsp; <strong>深度：</strong>生成分析计划（技能 + 步骤 + 参数） </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:2px">
+      <div style="font-size:10px;color:var(--gray-400);padding:0 4px"><span class="badge badge-primary" style="font-size:9px">A</span> 手选技能 + 自判断 &nbsp; <span class="badge badge-success" style="font-size:9px">B</span> 语义自动匹配技能</div>
+      <div style="font-size:10px;color:var(--gray-400);padding:0 4px"><span class="badge badge-primary" style="font-size:9px">A</span> 基础规划 &nbsp;  <span class="badge badge-success" style="font-size:9px">B</span> 基于评测补充规则校验 &nbsp; </div>
+    </div>
+
+    <div style="text-align:center;color:var(--gray-300);font-size:14px;padding:4px 0">↓</div>
+
+    <!-- ③ 执行阶段 -->
+    <div style="font-size:11px;font-weight:700;color:var(--primary-dark);letter-spacing:1px;margin-bottom:6px">③ 执行分析</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px">
+      <div style="padding:10px 12px;border-radius:6px;background:#fff;border:1px solid var(--gray-300);font-size:12px;color:var(--gray-700)">
+        <strong>三段式 UI 实时呈现</strong>
+        <span style="display:block;font-size:11px;color:var(--gray-500);margin-top:3px">Chat — 步骤摘要 + 结论<br>Process — 步骤进度 + 详情<br>Artifacts — 图表 / 数据表</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="padding:10px 12px;border-radius:6px;background:var(--primary-light);border:2px solid var(--primary);font-size:12px;color:var(--primary)">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--primary);margin-right:4px;vertical-align:middle"></span>
+          <strong>数据分析 Agent：逐步执行</strong>
+          <span style="display:block;font-size:11px;margin-top:2px;font-weight:400">代码沙箱中运行 → 每步产出数据/图表 → 实时推送到 UI</span>
+          <span style="display:block;font-size:10px;margin-top:2px;color:var(--gray-500)">LLM 调用 #2~N：逐步骤调用</span>
+        </div>
+        <div style="padding:10px 12px;border-radius:6px;background:var(--gray-100);border:1px solid var(--gray-300);font-size:11px;color:var(--gray-700)">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--gray-400);margin-right:4px;vertical-align:middle"></span>
+          🛡️ <strong>系统代码：运行时防护</strong>
+          <span style="display:block;font-size:10px;margin-top:2px;color:var(--gray-500)">每步执行后自动校验（步骤数合理、数据范围正确等），不需额外调用大模型</span>
+        </div>
+       
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:2px">
+      <div style="font-size:10px;color:var(--gray-400);padding:0 4px"><span class="badge badge-primary" style="font-size:9px">A</span> 三段式 UI + 步骤详情 &nbsp; </div>
+      <div style="font-size:10px;color:var(--gray-400);padding:0 4px"><span class="badge badge-primary" style="font-size:9px">A</span> 可观测性埋点 + 运行时防护 &nbsp; <span class="badge badge-success" style="font-size:9px">B</span> 基于评测补充规则校验 &nbsp; </div>
+    </div>
+
+    <div style="text-align:center;color:var(--gray-300);font-size:14px;padding:4px 0">↓</div>
+
+    <!-- ④ 结果交付 -->
+    <div style="font-size:11px;font-weight:700;color:var(--primary-dark);letter-spacing:1px;margin-bottom:6px">④ 结果交付</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px">
+      <div style="padding:10px 12px;border-radius:6px;background:var(--success-light);border:1px solid var(--success);font-size:12px;color:var(--success)">
+        <strong>获得结论 + 可视化产物</strong>
+        <span style="display:block;font-size:11px;margin-top:3px;color:var(--gray-600)">每步分析的执行与输出<br>报告/图表/文件<br>业务建议卡片</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="padding:10px 12px;border-radius:6px;background:var(--primary-light);border:2px solid var(--primary);font-size:12px;color:var(--primary)">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--primary);margin-right:4px;vertical-align:middle"></span>
+          <strong>数据分析 Agent：生成结论</strong>
+          <span style="display:block;font-size:11px;color:var(--gray-500);margin-top:3px">综合各步骤结果 → 最终结论 + 行动建议</span>
+          <span style="display:block;font-size:10px;margin-top:2px;color:var(--gray-500)">LLM 调用 #Final</span>
+        </div>
+        <div style="padding:10px 12px;border-radius:6px;background:var(--primary-light);border:2px solid var(--primary);font-size:11px;color:var(--primary)">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--primary);margin-right:4px;vertical-align:middle"></span>
+          🔍 <strong>结论反思（B 期）</strong>
+          <span style="display:block;font-size:10px;margin-top:2px;color:var(--gray-600)">同一个大模型额外调用一次，自检结论质量；不合格可重新生成一次（最多 1 次重试）</span>
+        </div>
+         <div style="padding:10px 12px;border-radius:6px;background:var(--gray-100);border:1px solid var(--gray-300);font-size:11px;color:var(--gray-700)">
+          📊 <strong>全程过程数据记录</strong>
+          <span style="display:block;font-size:10px;margin-top:2px">会话级 + 步骤级 + 模型调用级，供评测使用</span>
+        </div>
+        <!-- <div style="padding:10px 12px;border-radius:6px;background:var(--danger-light);border:2px dashed var(--danger);font-size:11px;color:var(--danger)">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--danger);margin-right:4px;vertical-align:middle"></span>
+          📋 <strong>离线质量评估（C 期）— 独立 Agent</strong>
+          <span style="display:block;font-size:10px;margin-top:2px;color:var(--gray-600)">结果交付后，另一个独立大模型（LLM-as-Judge）异步评分。6 维度评测，结果不影响当次交付，用于积累质量数据和驱动规则优化</span>
+        </div> -->
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:2px">
+      <div style="font-size:10px;color:var(--gray-400);padding:0 4px"><span class="badge badge-primary" style="font-size:9px">A</span> 图表/数据表/指标卡片/报告 &nbsp; <span class="badge badge-purple" style="font-size:9px">C</span> 自动推送结果</div>
+      <div style="font-size:10px;color:var(--gray-400);padding:0 4px"><span class="badge badge-primary" style="font-size:9px">A</span> 结论生成 &nbsp; <span class="badge badge-success" style="font-size:9px">B</span> 结论反思 &nbsp;  <span class="badge badge-purple" style="font-size:9px">C</span> LLM-as-Judge 离线评分</div>
+    </div>
+
+    <div style="text-align:center;color:var(--gray-300);font-size:14px;padding:4px 0">↓</div>
+
+    <!-- ⑤ 沉淀阶段 -->
+    <div style="font-size:11px;font-weight:700;color:var(--primary-dark);letter-spacing:1px;margin-bottom:6px">⑤ 沉淀 &amp; 自动化</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px">
+      <div style="padding:10px 12px;border-radius:6px;background:var(--purple-light);border:1px solid var(--purple);font-size:12px;color:var(--purple)">
+        <strong>保存报告 / 创建技能 / 设为定时任务</strong>
+        <span style="display:block;font-size:11px;margin-top:3px;color:var(--gray-600)">根据对话创建技能<br>根据对话设置定时任务<br>推送执行结果</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="padding:10px 12px;border-radius:6px;background:#fff;border:1px solid var(--purple);font-size:12px;color:var(--purple)">
+          <strong>技能注册</strong>
+          <span style="display:block;font-size:11px;margin-top:2px;font-weight:400">从对话提取技能 schema → 保存到技能库</span>
+        </div>
+        <div style="padding:10px 12px;border-radius:6px;background:#fff;border:1px solid var(--orange);font-size:12px;color:var(--orange)">
+          <strong>自动化任务注册</strong>
+          <span style="display:block;font-size:11px;margin-top:2px;font-weight:400">创建定时/阈值触发任务 → 配置推送渠道</span>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:2px">
+      <div style="font-size:10px;color:var(--gray-400);padding:0 4px"><span class="badge badge-primary" style="font-size:9px">A</span> 浏览预制技能 &nbsp; <span class="badge badge-success" style="font-size:9px">B</span> 从对话/报告生成技能 + 技能中心 &nbsp; <span class="badge badge-purple" style="font-size:9px">C</span> 创建自动化任务</div>
+      <div style="font-size:10px;color:var(--gray-400);padding:0 4px"><span class="badge badge-success" style="font-size:9px">B</span> 技能编辑器 + 匹配优化 &nbsp; <span class="badge badge-purple" style="font-size:9px">C</span> 定时/阈值触发 + 多渠道推送</div>
+    </div>
+
+  </div>
+
+  <!-- 约束策略总结 -->
+  <div class="callout callout-info" style="margin-top:0">
+    <strong>质量保障策略演进：</strong>
+    <strong>A 期 — 运行时防护：</strong>安全规则（代码强制）+ 质量引导（系统指令规则）+ 每步输出校验。用户在线，人工兜底。&nbsp;&nbsp;
+    <strong>B 期 — 迭代优化 + 反思：</strong>跑评测 → 发现问题 → 增补规则 / 校验技能 → 验证 ROI。结论阶段引入反思机制。&nbsp;&nbsp;
+    <strong>C 期 — 离线评测 + 自动校验：</strong>LLM-as-Judge 独立评分 + 无人值守场景系统兜底。
+  </div>
+
+
+<!-- S4: 迭代规划总览 -->
+<div class="section" id="s4">
+  <h2>4 迭代规划总览</h2>
+  <table>
+    <tr><th></th><th><span class="badge badge-primary">迭代 A</span><br><small>过程透明 + 基础技能</small></th><th><span class="badge badge-success">迭代 B</span><br><small>约束优化 + 技能框架</small></th><th><span class="badge badge-purple">迭代 C</span><br><small>自动化 + 自动评测</small></th></tr>
+    <tr>
+      <td><strong style="color:var(--primary)">🔄 过程透明</strong></td>
+      <td> 判断 简单/复杂意图（用户可切换） + 上下文组装与透明展示 + 分析计划可查看/确认 + （复杂场景）三段式 UI呈现分析产出  </td>
+      <td>多形态产出交付</td>
+      <td> - </td>
+    </tr>
+    <tr>
+      <td><strong style="color:var(--purple)">⚡ 技能</strong></td>
+      <td>3-5 预制技能 + 指定调用（用户手选）+ 参数提取 </td>
+      <td>语义匹配调用 + 从对话生成技能 + 技能编辑器 + 技能中心</td>
+      <td>组织级技能库</td>
+    </tr>
+    <tr>
+      <td><strong style="color:var(--orange)">🤖 自动化</strong></td>
+      <td>—</td>
+      <td>—</td>
+      <td>手动创建 + 从对话创建 + 定期执行 + 阈值触发 + 推送通知</td>
+    </tr>
+    <tr>
+      <td><strong style="color:var(--teal)">🛡️ 质量保障</strong></td>
+      <td>运行时防护（基础约束）+ 可观测性埋点 + PM 手动抽检 + 10 场景测试集</td>
+      <td>基于评测迭代 SP 规则 + 补充各执行阶段校验规则技能 + 结论反思机制</td>
+      <td>LLM-as-Judge 离线评测 + 自动校验兜底 + 评测闭环</td>
+    </tr>
+  </table>
+</div>
+
+<!-- S5: 迭代 A -->
+<div class="section" id="s5">
+  <h2>5 迭代 A：过程透明 + 基础技能</h2>
+
+  <h3>5.1 功能清单</h3>
+
+  <h4>🔄 过程透明</h4>
+  <table>
+    <tr><th>功能</th><th>描述</th><th>P</th></tr>
+    <tr><td>输入框可选技能</td><td> 技能选择 + 参数提取</td><td><span class="badge badge-danger">P0</span></td></tr>
+    <tr><td><strong>上下文组装</strong></td><td>数据（从看板获取各表的Schema/特征）+ 数据说明（获取指标维度定义/时间范围/筛选范围）+ 约束（安全约束+编码约束），统一注入系统指令</td><td><span class="badge badge-danger">P0</span></td></tr>
+    <tr><td><strong>简单/复杂自判断</strong></td><td>模型自动判断问题复杂度：单表单指标直接查询 → 直接回答（附「深入分析→」入口供用户切换为深度分析）；需拆解归因的复杂问题 → 走完整分析计划流程</td><td><span class="badge badge-danger">P0</span></td></tr>
+    <tr><td><strong>上下文透明展示</strong></td><td>分析计划中统一展示已注入的数据 + 数据说明</td><td><span class="badge badge-danger">P0</span></td></tr>
+    <tr><td>分析计划</td><td>模型思考后输出分析计划卡片：步骤列表 + 已注入上下文展示（数据 + 数据说明）+ 技能链 ；可选直接执行/确认后执行</td><td><span class="badge badge-danger">P0</span></td></tr>
+    <tr><td>三栏分屏布局</td><td>Chat + Process Panel + Artifacts Panel</td><td><span class="badge badge-danger">P0</span></td></tr>
+    <tr><td>Process 面板</td><td>步骤列表（全局进度）+ 步骤详情（代码 + 数据表 + 输出）</td><td><span class="badge badge-danger">P0</span></td></tr>
+    <tr><td>Artifacts 面板</td><td>图表 / 数据表 / 指标卡片渲染，随步骤实时更新</td><td><span class="badge badge-danger">P0</span></td></tr>
+  </table>
+
+  <h4>⚡ 技能</h4>
+  <table>
+    <tr><th>功能</th><th>描述</th><th>P</th></tr>
+    <tr><td>3-5 个预制技能</td><td>结构化技能定义，注册到技能列表</td><td><span class="badge badge-danger">P0</span></td></tr>
+    <tr><td>指定调用（用户手选）</td><td>输入区提供技能选择器，用户可手动选择/搜索技能，也可不选（自由分析）</td><td><span class="badge badge-danger">P0</span></td></tr>
+    <tr><td>参数提取</td><td>用户选定技能后，模型从对话中提取参数并按技能模板执行分析</td><td><span class="badge badge-danger">P0</span></td></tr>
+  </table>
+
+  <h4>🤖 自动化</h4>
+  <p style="color:#999; font-style:italic; margin:8px 0 16px;">迭代 A 暂无自动化功能，所有分析由用户手动触发。</p>
+
+  <h4>🛡️ 质量保障</h4>
+  <table>
+    <tr><th>功能</th><th>描述</th><th>P</th></tr>
+    <tr><td>基础约束</td><td>系统指令引导：安全规则 + 质量规则；系统代码在每步执行后做确定性校验</td><td><span class="badge badge-danger">P0</span></td></tr>
+    <tr><td>评测集 v1</td><td>n 个分析场景case 手动评测；每周抽检分析结果，标注 Pass/Fail + 原因 </td><td><span class="badge badge-danger">P0</span></td></tr>
+    <tr><td>可观测性埋点</td><td>全量过程记录：会话级 + 步骤级 + 模型调用级（如 langfuse 框架）</td><td><span class="badge badge-warning">P1</span></td></tr>
+   
+  </table>
+
+<h3>5.2 迭代 A 关键原型</h3>
+
+  <h4>原型 A-1：复杂分析 — 完整三栏布局（含上下文透明展示）</h4>
+  <div class="proto-frame">
+    <div class="proto-titlebar"><div class="proto-dot red"></div><div class="proto-dot yellow"></div><div class="proto-dot green"></div><span class="proto-title">复杂分析 · 三栏布局</span></div>
+    <div class="proto-content">
+      <div class="split-layout">
+        <div class="split-left">
+          <div class="chat-container">
+            <div class="chat-msg user"><div class="chat-avatar user">U</div><div class="chat-bubble user"><span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;background:var(--primary-light);color:var(--primary);border:1px solid var(--primary);margin-right:4px">📊 周报 GMV 归因</span> 帮我分析一下转化率下降的原因</div></div>
+            <div class="chat-msg"><div class="chat-avatar ai">A</div>
+              <div style="max-width:90%">
+                <div class="plan-card">
+                  <div class="plan-card-header"><span class="title">💡 分析计划</span><span class="badge badge-purple">周报 GMV 归因</span></div>
+                  <div class="plan-card-body">
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
+                    </div>
+                    <!-- Context Transparency Block -->
+                    <div class="context-block">
+                      <div class="context-block-header">📋 已注入的上下文 <span style="font-weight:400;margin-left:auto;font-size:10px;color:var(--gray-400)">▾ 展开查看</span></div>
+                      <div class="context-block-body">
+                        <div style="font-size:10px;font-weight:600;color:var(--gray-500);margin-bottom:4px">数据上下文</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">
+                          <span class="context-tag" style="background:var(--primary-light);color:var(--primary);border-color:rgba(37,99,235,.2)">机油-规格码-APP转化 看板</span><span class="context-tag" style="background:var(--primary-light);color:var(--primary);border-color:rgba(37,99,235,.2)">gmv_weekly 表 · 7列×35行</span><span class="context-tag" style="background:var(--primary-light);color:var(--primary);border-color:rgba(37,99,235,.2)">order_detail 表 · 12列×1,204行</span>
+                          <span class="context-tag" style="background:var(--primary-light);color:var(--primary);border-color:rgba(37,99,235,.2)">5城市 · 3品类 · 7天</span>
+                        </div>
+                        <div style="font-size:10px;font-weight:600;color:var(--gray-500);margin-bottom:4px">数据说明</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:4px">
+                          <span class="context-tag">GMV=订单金额合计（含退款前）</span>
+                          <span class="context-tag">转化率=下单UV/访问UV</span>
+                          <span class="context-tag">城市(省→市) · 品类(一级)</span>
+                          <span class="context-tag">日粒度 · 大促期15-17号</span>
+                        </div>
+                        <div style="font-size:10px;color:var(--gray-400);margin-top:6px">看板查数 + 后台数据说明接口</div>
+                      </div>
+                    </div>
+                    <div style="font-size:11px;color:var(--gray-400)">5 个步骤 → 右侧 Process 面板查看详情</div>
+                  </div>
+                </div>
+                <div class="step-inline"><span class="process-dot done"></span><span class="step-icon">📥</span><span class="step-name">数据加载</span><span class="step-summary"><span style="padding:1px 5px;border-radius:3px;background:var(--purple-light);color:var(--purple);font-size:10px;margin-right:3px">周报 GMV 归因</span>gmv_weekly · order_detail</span><span class="step-time">2.1s</span></div>
+                <div class="step-inline"><span class="process-dot done"></span><span class="step-icon">🔢</span><span class="step-name">整体环比</span><span class="step-summary"><span style="padding:1px 5px;border-radius:3px;background:var(--teal-light);color:var(--teal);font-size:10px;margin-right:3px">gmv_weekly</span>GMV -12.3%</span><span class="step-time">1.8s</span></div>
+                <div class="step-inline" style="border-color:var(--warning)"><span class="process-dot running"></span><span class="step-icon">🔍</span><span class="step-name">城市拆解</span><span class="step-summary"><span style="padding:1px 5px;border-radius:3px;background:var(--teal-light);color:var(--teal);font-size:10px;margin-right:3px">gmv_weekly</span><span style="color:var(--warning)">执行中...</span></span></div>
+              </div>
+            </div>
+          </div>
+          <div class="input-bar" style="flex-direction:column;gap:6px">
+            <div style="display:flex;gap:6px;width:100%;font-size:11px;align-items:center"><span style="color:var(--gray-400)">✦ 技能</span><span style="display:inline-block;padding:2px 8px;border-radius:4px;background:var(--primary-light);color:var(--primary);border:1px solid var(--primary);font-size:10px">📊 周报 GMV 归因</span></div>
+            <div style="display:flex;gap:8px;width:100%;align-items:center">
+              <div class="toggle-row"><div class="toggle"></div><span>确认</span></div>
+              <input class="input-field" placeholder="描述你的分析问题，或输入 / 选择技能">
+              <button class="send-btn">↑</button>
+            </div>
+          </div>
+        </div>
+        <div class="split-right">
+          <div class="panel-tabs"><div class="panel-tab active">Process</div><div class="panel-tab">Artifacts</div></div>
+          <div class="process-list">
+            <div class="process-item" style="opacity:.6"><span class="process-dot done"></span><div><div style="font-weight:500;color:var(--gray-700);font-size:12px">📥 数据加载 <span style="font-size:10px;padding:1px 5px;border-radius:3px;background:var(--purple-light);color:var(--purple)">周报 GMV 归因</span></div><div class="process-label">gmv_weekly · order_detail · 2表</div></div><span class="process-time">2.1s</span></div>
+            <div class="process-item" style="opacity:.6"><span class="process-dot done"></span><div><div style="font-weight:500;color:var(--gray-700);font-size:12px">🔢 整体环比</div><div class="process-label"><span style="color:var(--teal)">gmv_weekly</span> · GMV -12.3%</div></div><span class="process-time">1.8s</span></div>
+            <div class="process-item active"><span class="process-dot running"></span><div><div style="font-weight:500;color:var(--primary);font-size:12px">🔍 城市拆解</div><div class="process-label"><span style="color:var(--teal)">gmv_weekly</span> · <span style="color:var(--warning)">执行中...</span></div></div></div>
+            <div class="process-item" style="opacity:.4"><span class="process-dot pending"></span><div><div style="font-weight:500;color:var(--gray-500);font-size:12px">🔍 品类交叉</div><div class="process-label" style="color:var(--gray-400)">gmv_weekly + order_detail</div></div></div>
+            <div class="process-item" style="opacity:.4"><span class="process-dot pending"></span><div><div style="font-weight:500;color:var(--gray-500);font-size:12px">💡 归因结论</div><div class="process-label" style="color:var(--gray-400)">汇总</div></div></div>
+          </div>
+          <div class="process-detail">
+            <div class="process-detail-title">🔢 整体环比 <span class="badge badge-success" style="font-size:10px">完成</span></div>
+            <div class="process-code">city_change = (this_week / last_week - 1) * 100</div>
+            <div class="process-data"><table><tr><th>指标</th><th>本周</th><th>上周</th><th>环比</th></tr><tr><td>GMV</td><td>1,234,567</td><td>1,407,890</td><td style="color:var(--danger)">-12.3%</td></tr></table></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h4>原型 A-2：执行前确认分析计划</h4>
+  <div class="proto-frame">
+    <div class="proto-titlebar"><div class="proto-dot red"></div><div class="proto-dot yellow"></div><div class="proto-dot green"></div><span class="proto-title">执行前确认分析计划</span></div>
+    <div class="proto-content">
+      <div class="split-layout" style="min-height:480px">
+        <div class="split-left">
+          <div class="chat-container">
+            <div class="chat-msg user"><div class="chat-avatar user">U</div><div class="chat-bubble user"><span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;background:var(--primary-light);color:var(--primary);border:1px solid var(--primary);margin-right:4px">📊 保养机油转化分析</span> 帮我分析一下转化率下降的原因</div></div>
+            <div class="chat-msg"><div class="chat-avatar ai">A</div>
+              <div style="max-width:90%">
+                <div style="font-size:12px;color:var(--gray-500);margin-bottom:6px">好的，我已理解看板数据。请确认以下分析计划：</div>
+                <div class="plan-card" style="border-color:var(--warning)">
+                  <div class="plan-card-header" style="background:var(--warning-light)">
+                    <span class="title" style="color:#92400e">💡 分析计划 <span class="badge badge-warning">等待确认</span></span>
+                    <span class="badge badge-purple" style="font-size:10px">保养机油转化分析</span>
+                  </div>
+                  <div class="plan-card-body">
+                    <div class="context-block" style="margin-bottom:10px">
+                      <div class="context-block-header" style="font-size:11px">📋 已载入上下文</div>
+                      <div class="context-block-body" style="padding:6px 10px">
+                        <div style="display:flex;flex-wrap:wrap;gap:4px">
+                          <span class="context-tag" style="background:var(--primary-light);color:var(--primary);border-color:rgba(37,99,235,.2)">机油-规格码-APP转化 看板</span>
+                          <span class="context-tag">报警指标：端转</span>
+                          <span class="context-tag">过滤条件：region=ALL</span>
+                          <span class="context-tag">时间：2023-10-01 to 12-31</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div style="font-size:12px;font-weight:600;color:var(--gray-700);margin-bottom:6px">📋 共 5 个分析步骤</div>
+                    <div style="font-size:12px;color:var(--gray-600)">
+                      <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--gray-100)">
+                        <span style="width:20px;height:20px;border-radius:50%;background:var(--gray-200);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0">1</span>
+                        <div><div>确认整体转化率下降的数据：端转环比变化、绝对值</div><div style="font-size:10px;color:var(--teal);margin-top:2px">trend_analysis</div></div>
+                      </div>
+                      <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--gray-100)">
+                        <span style="width:20px;height:20px;border-radius:50%;background:var(--gray-200);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0">2</span>
+                        <div><div>按「流量来源」维度拆解转化率，找出下降最大的 Top 5 来源</div><div style="font-size:10px;color:var(--teal);margin-top:2px">dimension_breakdown</div></div>
+                      </div>
+                      <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--gray-100)">
+                        <span style="width:20px;height:20px;border-radius:50%;background:var(--gray-200);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0">3</span>
+                        <div><div>对每个异常流量来源进一步下钻，定位具体异常原因</div><div style="font-size:10px;color:var(--teal);margin-top:2px">root_cause_drill</div></div>
+                      </div>
+                      <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--gray-100)">
+                        <span style="width:20px;height:20px;border-radius:50%;background:var(--gray-200);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0">4</span>
+                        <div><div>计算每个流量来源的 UV 价值（GMV / UV），对比本期与上期变化</div><div style="font-size:10px;color:var(--teal);margin-top:2px">custom_compute <span style="color:var(--orange);font-weight:600">⚡ 自定义计算</span></div></div>
+                      </div>
+                      <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0">
+                        <span style="width:20px;height:20px;border-radius:50%;background:var(--gray-200);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0">5</span>
+                        <div><div>整理结论与建议，生成分析报告</div><div style="font-size:10px;color:var(--teal);margin-top:2px">conclusion_synthesis</div></div>
+                      </div>
+                    </div>
+                    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+                      <button style="padding:6px 16px;background:var(--primary);color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer">✓ 确认执行</button>
+                      <button style="padding:6px 16px;background:#fff;color:var(--gray-600);border:1px solid var(--gray-300);border-radius:6px;font-size:12px;cursor:pointer">✎ 修改计划</button>
+                      <button style="padding:6px 12px;background:#fff;color:var(--gray-400);border:1px solid var(--gray-200);border-radius:6px;font-size:11px;cursor:pointer">⚡ 直接回答（跳过深度分析）</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="input-bar" style="flex-direction:column;gap:6px"><div style="display:flex;gap:6px;width:100%;font-size:11px;align-items:center"><span style="color:var(--gray-400)">✦ 技能</span><span style="display:inline-block;padding:2px 8px;border-radius:4px;background:var(--primary-light);color:var(--primary);border:1px solid var(--primary);font-size:10px">📊 保养机油转化分析</span></div><div style="display:flex;gap:8px;width:100%;align-items:center"><div class="toggle-row"><div class="toggle on"></div><span>确认</span></div><input class="input-field" placeholder="描述你的分析问题，或输入 / 选择技能"><button class="send-btn">↑</button></div></div>
+        </div>
+        <div class="split-right">
+          <div class="panel-tabs"><div class="panel-tab active">Process</div><div class="panel-tab">Artifacts</div></div>
+          <div class="process-list">
+            <div style="padding:10px;text-align:center;color:var(--warning);font-size:12px;font-weight:600">⏳ 等待确认后开始执行</div>
+            <div class="process-item" style="opacity:.5"><span class="process-dot pending"></span><div><div style="font-weight:500;color:var(--gray-500);font-size:12px">📈 确认转化率下降</div><div class="process-label">trend_analysis</div></div></div>
+            <div class="process-item" style="opacity:.5"><span class="process-dot pending"></span><div><div style="font-weight:500;color:var(--gray-500);font-size:12px">🔍 流量来源拆解</div><div class="process-label">dimension_breakdown</div></div></div>
+            <div class="process-item" style="opacity:.5"><span class="process-dot pending"></span><div><div style="font-weight:500;color:var(--gray-500);font-size:12px">🔍 异常来源下钻</div><div class="process-label">root_cause_drill</div></div></div>
+            <div class="process-item" style="opacity:.5"><span class="process-dot pending"></span><div><div style="font-weight:500;color:var(--gray-500);font-size:12px">🔢 UV 价值计算</div><div class="process-label">custom_compute</div></div></div>
+            <div class="process-item" style="opacity:.5"><span class="process-dot pending"></span><div><div style="font-weight:500;color:var(--gray-500);font-size:12px">💡 结论与建议</div><div class="process-label">conclusion_synthesis</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h4>原型 A-3：简单查询 — 直接回答 + 可切换深度分析</h4>
+  <div class="proto-frame">
+    <div class="proto-titlebar"><div class="proto-dot red"></div><div class="proto-dot yellow"></div><div class="proto-dot green"></div><span class="proto-title">简单查询 · 可切换深度分析</span></div>
+    <div class="proto-content">
+      <div class="chat-container">
+        <div class="chat-msg user"><div class="chat-avatar user">U</div><div class="chat-bubble user">上周保养线整体 GMV 是多少？环比变化如何？</div></div>
+        <div class="chat-msg"><div class="chat-avatar ai">A</div>
+          <div style="max-width:80%">
+            <div style="font-size:11px;color:var(--gray-400);margin-bottom:6px">Data Agent · 3 秒</div>
+            <div style="display:flex;gap:16px;padding:14px 18px;border:1px solid var(--gray-200);border-radius:10px;background:#fff;margin-bottom:8px">
+              <div>
+                <div style="font-size:11px;color:var(--gray-500)">上周保养线整体 GMV</div>
+                <div style="font-size:24px;font-weight:800;color:var(--primary)">3,240 万</div>
+              </div>
+              <div style="border-left:1px solid var(--gray-200);padding-left:16px">
+                <div style="font-size:11px;color:var(--gray-500)">环比变化</div>
+                <div style="font-size:16px;font-weight:700;color:var(--danger)">↓ 12.3%</div>
+                <div style="font-size:11px;color:var(--gray-400)">上上周 3,694 万</div>
+              </div>
+            </div>
+            <div class="chat-bubble ai" style="margin-top:0">保养线整体 GMV 上周为 3,240 万元，环比下降 12.3%（上上周 3,694 万）。下降幅度超过常规波动范围（±5%），建议关注。</div>
+            <div style="margin-top:6px"><a style="font-size:12px;color:var(--primary);cursor:pointer;text-decoration:none">🔍 深入分析下降原因 →</a></div>
+          </div>
+        </div>
+        <div class="chat-msg user"><div class="chat-avatar user">U</div><div class="chat-bubble user">哪个城市下降最多？</div></div>
+        <div class="chat-msg"><div class="chat-avatar ai">A</div>
+          <div style="max-width:80%">
+            <div style="font-size:11px;color:var(--gray-400);margin-bottom:6px">Data Agent · 5 秒</div>
+            <div style="padding:12px 16px;border:1px solid var(--gray-200);border-radius:10px;background:#fff;font-size:13px;line-height:1.7">
+              <strong>上海下降幅度最大，GMV 环比 -23.6%</strong>（贡献整体下降的 41%）<br>
+              <span style="color:var(--gray-500)">Top 3 下降城市：上海 -23.6% · 北京 -18.2% · 杭州 -14.7%</span><br>
+              <span style="color:var(--gray-500)">Top 3 上升城市：深圳 +8.3% · 成都 +5.1% · 武汉 +2.9%</span>
+            </div>
+            <div style="margin-top:6px"><a style="font-size:12px;color:var(--primary);cursor:pointer;text-decoration:none">🔍 深入分析上海下降原因 →</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h4>原型 A-4：Artifacts 图表可视化</h4>
+  <div class="proto-frame">
+    <div class="proto-titlebar"><div class="proto-dot red"></div><div class="proto-dot yellow"></div><div class="proto-dot green"></div><span class="proto-title">Artifacts 图表</span></div>
+    <div class="proto-content">
+      <div class="split-layout" style="min-height:380px">
+        <div class="split-left">
+          <div class="chat-container">
+            <div class="chat-msg"><div class="chat-avatar ai">A</div>
+              <div style="max-width:90%">
+                <div class="step-inline"><span class="process-dot done"></span><span class="step-icon">📥</span><span class="step-name">数据加载</span><span class="step-summary" style="font-size:10px;color:var(--teal)">gmv_weekly · order_detail</span><span class="step-time">2.1s</span></div>
+                <div class="step-inline"><span class="process-dot done"></span><span class="step-icon">🔍</span><span class="step-name">城市拆解</span><span class="step-summary" style="font-size:10px;color:var(--teal)">gmv_weekly</span><span class="step-time">3.2s</span></div>
+                <div class="step-inline"><span class="process-dot done"></span><span class="step-icon">🔍</span><span class="step-name">品类交叉</span><span class="step-summary" style="font-size:10px;color:var(--teal)">gmv_weekly + order_detail</span><span class="step-time">2.5s</span></div>
+                <div class="step-inline"><span class="process-dot done"></span><span class="step-icon">💡</span><span class="step-name">归因结论</span><span class="step-summary" style="font-size:10px;color:var(--gray-400)">汇总</span><span class="step-time">1.2s</span></div>
+                <div class="chat-bubble ai" style="margin-top:8px"><strong>归因结论：</strong>上周 GMV 下降 12.3%，核心因子：上海 -21.5%（贡献 49.5%），轮胎品类 -18.2%（贡献 33.1%）。<br><span style="font-size:12px;color:var(--gray-400)">建议排查上海轮胎供应链</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="split-right">
+          <div class="panel-tabs"><div class="panel-tab">Process</div><div class="panel-tab active">Artifacts</div></div>
+          <div class="artifact-panel">
+            <div class="artifact-card">
+              <div class="artifact-card-header">📊 城市 GMV 环比变化 <span style="margin-left:auto;color:var(--gray-400);font-weight:400">Step 2</span></div>
+              <div class="artifact-card-body">
+                <div class="mini-bar" style="justify-content:center;height:80px;gap:16px">
+                  <div style="text-align:center"><div class="bar" style="height:70px;width:32px;background:var(--danger)"></div><div style="font-size:10px;color:var(--gray-500);margin-top:4px">上海<br><strong style="color:var(--danger)">-21.5%</strong></div></div>
+                  <div style="text-align:center"><div class="bar" style="height:40px;width:32px;background:var(--danger);opacity:.7"></div><div style="font-size:10px;color:var(--gray-500);margin-top:4px">北京<br>-9.9%</div></div>
+                  <div style="text-align:center"><div class="bar" style="height:25px;width:32px;background:var(--warning)"></div><div style="font-size:10px;color:var(--gray-500);margin-top:4px">杭州<br>-5.2%</div></div>
+                  <div style="text-align:center"><div class="bar" style="height:15px;width:32px;background:var(--success)"></div><div style="font-size:10px;color:var(--gray-500);margin-top:4px">广州<br>+2.1%</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="artifact-card">
+              <div class="artifact-card-header">📋 拆解明细表 <span style="margin-left:auto;color:var(--gray-400);font-weight:400">Step 2</span></div>
+              <div class="artifact-card-body" style="padding:0">
+                <table style="margin:0;font-size:11px"><tr><th>城市</th><th>本周</th><th>上周</th><th>环比</th><th>贡献%</th></tr><tr><td>上海</td><td>312K</td><td>398K</td><td style="color:var(--danger)">-21.5%</td><td><strong>49.5%</strong></td></tr><tr><td>北京</td><td>289K</td><td>321K</td><td style="color:var(--danger)">-9.9%</td><td>18.4%</td></tr></table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- S6: 迭代 B -->
+<div class="section" id="s6">
+  <h2>6 迭代 B：约束优化 + 技能框架</h2>
+
+  <h3>6.1 功能清单</h3>
+<!-- 
+  <h4>🔄 过程透明</h4>
+  <table>
+    <tr><th>功能</th><th>描述</th></tr>
+    <tr><td>多轮对话上下文管理</td><td>定义追问、切换话题、引用历史结果三种多轮场景的产品行为（见下方规则表）</td></tr>
+  </table>
+
+  <h4>多轮对话产品规则</h4>
+  <table>
+    <tr><th>场景</th><th>用户行为示例</th><th>上下文继承规则</th><th>产品表现</th></tr>
+    <tr><td><strong>追问深挖</strong></td><td>「上海为什么下降？再按品类拆一下」</td><td>继承当前分析的数据上下文 + 已计算结果 + 技能参数</td><td>在同一 Process 面板中追加步骤，Artifacts 面板累积展示</td></tr>
+    <tr><td><strong>切换话题</strong></td><td>「换个问题，看一下退款率趋势」</td><td>保留数据上下文（同一看板），清空前轮分析结果和技能参数</td><td>Process 面板重置，开始新的分析计划</td></tr>
+    <tr><td><strong>引用历史</strong></td><td>「刚才算的 GMV 数据，帮我生成一份报告」</td><td>从历史轮次提取被引用的数据/结论，注入当前上下文</td><td>Chat 区显示引用来源，Process 面板展示新的报告生成步骤</td></tr>
+    <tr><td><strong>上下文窗口</strong></td><td>对话超过 10 轮</td><td>早期轮次压缩为摘要（保留关键结论和数据引用），近 5 轮保留完整上下文</td><td>用户无感知，模型回答质量不因对话变长而明显下降</td></tr>
+  </table>
+  <div class="callout callout-info"><strong>迭代节奏：</strong>A 期仅支持单轮分析（每次提问独立处理）；B 期实现追问深挖 + 切换话题 + 上下文窗口管理；引用历史为 B 期 P1，视开发资源决定。</div> -->
+
+  <h4>⚡ 技能</h4>
+  <table>
+    <tr><th>功能</th><th>描述</th></tr>
+    <tr><td>语义匹配调用</td><td>用户不选技能时，模型根据问题自动选择最匹配的技能</td></tr>
+    <tr><td>从对话生成技能</td><td>分析完成后点击「保存为技能」，从当前对话自动生成技能草稿供编辑</td></tr>
+    <tr><td>技能编辑器</td><td>可视化编辑技能的名称、描述、分析步骤、参数、约束</td></tr>
+    <tr><td>技能中心</td><td>系统技能 + 个人技能分区展示，支持搜索、浏览、一键添加到对话</td></tr>
+    <tr><td>技能匹配优化</td><td>根据迭代 A 积累的匹配数据优化技能描述，提升自动匹配准确率</td></tr>
+  </table>
+
+  <h4>🤖 自动化</h4>
+  <p style="color:#999; font-style:italic; margin:8px 0 16px;">迭代 B 暂无自动化功能，全部在迭代 C 落地。</p>
+
+  <h4>🛡️ 质量保障</h4>
+  <table>
+    <tr><th>功能</th><th>描述</th></tr>
+    <tr><td>迭代 Prompt 规则</td><td>基于迭代 A 评测数据，增补质量规则到系统指令，逐条验证跑评测集对比有/无该规则的评分差异，ROI 达标才上线</td></tr>
+    <tr><td>结论反思机制</td><td>结论生成后，同一个大模型额外调用一次自检结论质量（是否完整、数值是否一致），不合格可重新生成一次</td></tr>
+    <tr><td>评测集 v2</td><td>预计30 个场景（含语义匹配 + 多技能场景）</td></tr>
+  </table>
+
+  <h3>6.2 迭代 B 关键原型</h3>
+
+  <h4>原型 B-1：技能中心</h4>
+  <div class="proto-frame">
+    <div class="proto-titlebar"><div class="proto-dot red"></div><div class="proto-dot yellow"></div><div class="proto-dot green"></div><span class="proto-title">技能中心</span></div>
+    <div class="proto-content" style="padding:0">
+      <div style="display:flex;min-height:380px">
+        <div style="width:160px;background:var(--gray-50);border-right:1px solid var(--gray-200);padding:12px 0;font-size:12px">
+          <div style="padding:8px 16px;color:var(--gray-400);cursor:pointer">+ 新对话</div>
+          <div style="padding:8px 16px;background:var(--primary-light);color:var(--primary);font-weight:600;border-left:3px solid var(--primary)">⚡ 技能中心</div>
+          <div style="padding:8px 16px;color:var(--gray-500);cursor:pointer">🤖 自动化</div>
+          <div style="margin-top:16px;padding:0 16px;font-size:11px;color:var(--gray-400)">全部对话</div>
+          <div style="padding:6px 16px;font-size:11px;color:var(--gray-500)">整体转化总结 ⭐</div>
+          <div style="padding:6px 16px;font-size:11px;color:var(--gray-500)">壳美嘉转化分析</div>
+        </div>
+        <div style="flex:1;padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div style="font-size:18px;font-weight:700">技能</div>
+            <div style="display:flex;gap:8px">
+              <button style="padding:5px 12px;background:#fff;border:1px solid var(--gray-300);border-radius:6px;font-size:11px;cursor:pointer">→ 从现有报告沉淀技能</button>
+              <button style="padding:5px 12px;background:var(--primary);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer">+ 创建新技能</button>
+            </div>
+          </div>
+          <div style="padding:6px 12px;border:1px solid var(--gray-200);border-radius:6px;margin-bottom:16px;font-size:11px;color:var(--gray-400)">🔍 搜索技能...</div>
+          <div style="font-size:12px;font-weight:600;color:var(--gray-500);margin-bottom:8px">系统</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+            <div style="padding:10px;border:1px solid var(--gray-200);border-radius:8px;font-size:11px"><div style="font-weight:600;margin-bottom:2px">📊 营收异常诊断</div><div style="color:var(--gray-400);font-size:10px">自动定位城市/门店的营收变动</div></div>
+            <div style="padding:10px;border:1px solid var(--gray-200);border-radius:8px;font-size:11px"><div style="font-weight:600;margin-bottom:2px">📈 归因分析</div><div style="color:var(--gray-400);font-size:10px">拆业务问题趋势、对比、下钻</div></div>
+            <div style="padding:10px;border:1px solid var(--gray-200);border-radius:8px;font-size:11px"><div style="font-weight:600;margin-bottom:2px">📄 报告生成器</div><div style="color:var(--gray-400);font-size:10px">将结论渲染为正式报告文件</div></div>
+            <div style="padding:10px;border:1px solid var(--gray-200);border-radius:8px;font-size:11px"><div style="font-weight:600;margin-bottom:2px">⏰ 定时任务发布</div><div style="color:var(--gray-400);font-size:10px">把分析转为定期自动运行任务</div></div>
+            <div style="padding:10px;border:1px solid var(--gray-200);border-radius:8px;font-size:11px"><div style="font-weight:600;margin-bottom:2px">✏️ Skill Creator</div><div style="color:var(--gray-400);font-size:10px">从对话自动生成结构化 Skill</div></div>
+          </div>
+          <div style="font-size:12px;font-weight:600;color:var(--gray-500);margin-bottom:8px">个人</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+            <div style="padding:10px;border:1px solid var(--gray-200);border-radius:8px;font-size:11px"><div style="font-weight:600;margin-bottom:2px">📊 机油流量分析</div><div style="color:var(--gray-400);font-size:10px">自动定位流量异常，输出下钻路径</div></div>
+            <div style="padding:10px;border:1px solid var(--gray-200);border-radius:8px;font-size:11px"><div style="font-weight:600;margin-bottom:2px">📊 机油规格码分析</div><div style="color:var(--gray-400);font-size:10px">自动定位流量异常，输出下钻路径</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h4>原型 B-2：从对话生成技能</h4>
+  <div class="proto-frame">
+    <div class="proto-titlebar"><div class="proto-dot red"></div><div class="proto-dot yellow"></div><div class="proto-dot green"></div><span class="proto-title">对话转技能（迭代 B）</span></div>
+    <div class="proto-content">
+      <div class="chat-container" style="margin-bottom:12px">
+        <div class="chat-msg"><div class="chat-avatar ai">A</div>
+          <div style="max-width:90%">
+            <div style="padding:12px 16px;border:1px solid var(--gray-200);border-radius:10px;background:#fff;margin-bottom:8px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="font-size:14px">📊</span>
+                <strong style="font-size:13px">转化率下降归因报告</strong>
+                <span style="font-size:11px;color:var(--gray-400);margin-left:auto">Data Agent · 耗时 27 秒</span>
+                <span style="font-size:11px;color:var(--gray-400);padding:2px 8px;border:1px solid var(--gray-200);border-radius:4px;cursor:pointer">导出</span>
+                <span style="font-size:11px;color:var(--gray-400);padding:2px 8px;border:1px solid var(--gray-200);border-radius:4px;cursor:pointer">分享</span>
+              </div>
+              <div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:4px">结论摘要</div>
+              <div style="font-size:12px;color:var(--gray-500);line-height:1.6">转化率下降主要归因于<a style="color:var(--primary);text-decoration:underline">自然流量-宫格</a>和<a style="color:var(--primary);text-decoration:underline">自然流量-弹窗</a>两个入口的流量质量下降...</div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button style="padding:6px 14px;background:var(--primary);color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600">+ 创建为技能</button>
+              <button style="padding:6px 14px;background:var(--orange);color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600">⏰ 设为定时任务</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:16px;border:2px solid var(--purple);border-radius:10px;background:var(--purple-light)">
+        <div style="font-size:14px;font-weight:700;color:var(--purple);margin-bottom:12px">⚡ 从当前分析创建技能</div>
+        <div style="margin-bottom:10px">
+          <div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:4px">名称</div>
+          <div style="padding:8px 12px;border:1px solid var(--gray-200);border-radius:6px;background:#fff;font-size:12px;color:var(--gray-700)">保养机油转化分析</div>
+        </div>
+        <div style="margin-bottom:10px">
+          <div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:4px">描述</div>
+          <div style="padding:8px 12px;border:1px solid var(--gray-200);border-radius:6px;background:#fff;font-size:12px;color:var(--gray-500)">分析转化率变化原因，按流量来源拆解并下钻定位异常。</div>
+        </div>
+        <div style="margin-bottom:10px">
+          <div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:4px">分析步骤描述</div>
+          <div style="border:1px solid var(--gray-200);border-radius:6px;background:#fff;overflow:hidden">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 12px;border-bottom:1px solid var(--gray-100);font-size:12px"><span><strong>1</strong>&nbsp; 确认整体转化率下降的数据</span><span style="color:var(--teal);font-size:11px">trend_analysis</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 12px;border-bottom:1px solid var(--gray-100);font-size:12px"><span><strong>2</strong>&nbsp; 按流量来源维度拆解，找 Top 5</span><span style="color:var(--teal);font-size:11px">dimension_breakdown</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 12px;border-bottom:1px solid var(--gray-100);font-size:12px"><span><strong>3</strong>&nbsp; 异常来源下钻定位原因</span><span style="color:var(--teal);font-size:11px">root_cause_drill</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 12px;border-bottom:1px solid var(--gray-100);font-size:12px"><span><strong>4</strong>&nbsp; 计算各来源 UV 价值对比</span><span style="color:var(--orange);font-size:11px">custom_compute ⚡</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 12px;font-size:12px"><span><strong>5</strong>&nbsp; 整理结论与建议</span><span style="color:var(--teal);font-size:11px">conclusion_synthesis</span></div>
+          </div>
+        </div>
+        <div style="margin-bottom:10px">
+          <div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:4px">参数定义</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <div style="padding:6px 10px;border:1px solid var(--gray-200);border-radius:6px;background:#fff;font-size:11px"><span style="color:var(--gray-400)">报警指标</span> <strong>端转</strong></div>
+            <div style="padding:6px 10px;border:1px solid var(--gray-200);border-radius:6px;background:#fff;font-size:11px"><span style="color:var(--gray-400)">拆解维度</span> <strong>流量来源</strong></div>
+            <div style="padding:6px 10px;border:1px solid var(--gray-200);border-radius:6px;background:#fff;font-size:11px"><span style="color:var(--gray-400)">过滤条件</span> <strong>region=ALL</strong></div>
+            <div style="padding:6px 10px;border:1px solid var(--gray-200);border-radius:6px;background:#fff;font-size:11px"><span style="color:var(--gray-400)">异常阈值</span> <strong>环比 >10%</strong></div>
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:4px">约束/限定</div>
+          <div style="padding:8px 12px;border:1px solid var(--gray-200);border-radius:6px;background:#fff;font-size:12px;color:var(--gray-500)">必须量化贡献占比 · 必须给出行动建议 · 异常定义：环比 >10%</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button style="padding:6px 14px;background:var(--primary);color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600">保存技能</button>
+          <button style="padding:6px 14px;background:#fff;color:var(--gray-600);border:1px solid var(--gray-300);border-radius:6px;font-size:12px;cursor:pointer">编辑后保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h4>原型 B-3：调用技能执行分析</h4>
+  <div class="proto-frame">
+    <div class="proto-titlebar"><div class="proto-dot red"></div><div class="proto-dot yellow"></div><div class="proto-dot green"></div><span class="proto-title">调用技能 · 参数提取</span></div>
+    <div class="proto-content">
+      <div class="chat-container">
+        <div class="chat-msg user"><div class="chat-avatar user">U</div><div class="chat-bubble user"><span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;background:var(--purple-light);color:var(--purple);border:1px solid var(--purple);margin-right:4px">⚡ 保养机油转化分析</span> 帮我看看上周转化率为什么掉了</div></div>
+        <div class="chat-msg"><div class="chat-avatar ai">A</div>
+          <div style="max-width:90%">
+            <div style="font-size:11px;color:var(--gray-400);margin-bottom:6px">已匹配技能：保养机油转化分析 · 正在提取参数…</div>
+            <div style="padding:12px 16px;border:1px solid var(--purple);border-radius:10px;background:var(--purple-light);margin-bottom:8px">
+              <div style="font-size:12px;font-weight:600;color:var(--purple);margin-bottom:8px">⚡ 技能参数</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px">
+                <div><span style="color:var(--gray-400)">报警指标：</span><strong>端转</strong></div>
+                <div><span style="color:var(--gray-400)">拆解维度：</span><strong>流量来源</strong></div>
+                <div><span style="color:var(--gray-400)">时间范围：</span><strong>上周（自动识别）</strong></div>
+                <div><span style="color:var(--gray-400)">异常阈值：</span><strong>环比 >10%（默认）</strong></div>
+              </div>
+            </div>
+            <div class="plan-card">
+              <div class="plan-card-header"><span class="title">💡 分析计划</span><span class="badge badge-purple">保养机油转化分析</span></div>
+              <div class="plan-card-body">
+                <div style="font-size:12px;color:var(--gray-600);line-height:1.8">
+                  <div>1. 确认整体转化率下降的数据</div>
+                  <div>2. 按流量来源拆解 Top 5</div>
+                  <div>3. 异常来源下钻定位原因</div>
+                  <div>4. 计算各来源 UV 价值对比</div>
+                  <div>5. 整理结论与建议</div>
+                </div>
+                <div style="font-size:11px;color:var(--gray-400);margin-top:8px">5 个步骤 → 右侧 Process 面板查看详情</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S7: 迭代 C -->
+<div class="section" id="s7">
+  <h2>7 迭代 C：自动化 + 自动评测</h2>
+
+  <h3>7.1 功能清单</h3>
+<!-- 
+  <h4>🔄 过程透明</h4>
+  <table>
+    <tr><th>功能</th><th>描述</th></tr>
+    <tr><td>体验打磨</td><td>基于用户反馈优化三段式 UI 交互细节</td></tr>
+  </table> -->
+
+  <h4>⚡ 技能</h4>
+  <table>
+    <tr><th>功能</th><th>描述</th></tr>
+    <tr><td>组织级技能库</td><td>管理员审核后发布为组织公共技能，全员可调用</td></tr>
+  </table>
+
+  <h4>🤖 自动化</h4>
+  <table>
+    <tr><th>功能</th><th>描述</th></tr>
+    <tr><td>创建自动化</td><td>在自动化管理页配置：选择分析 + 设置执行频率 + 推送渠道</td></tr>
+    <tr><td>定期执行</td><td>按 cron 定时（每日/每周）自动运行分析</td></tr>
+    <tr><td>阈值触发</td><td>用户配置监控指标 + 触发条件 + 阈值，异常时自动发起归因分析</td></tr>
+    <tr><td>推送通知</td><td>站内通知 + 企业微信 + 邮件，推送分析结果</td></tr>
+  </table>
+
+  <h4>🛡️ 质量保障</h4>
+  <table>
+    <tr><th>功能</th><th>描述</th></tr>
+    <tr><td>LLM-as-Judge 离线评测</td><td>独立的评估 Agent（另一个大模型），6 维度 Pass/Fail 自动评分，每日批量运行，替代人工抽检</td></tr>
+    <tr><td>自动校验兜底</td><td>自动化执行（无人值守）场景下，系统代码在关键节点做规则拦截校验</td></tr>
+    <tr><td>评测闭环优化运行质量</td><td>评测 → 人工校准 → 约束优化 → 回归验证，形成完整迭代闭环</td></tr>
+  </table>
+
+  <h3>7.2 迭代 C 关键原型</h3>
+
+  <h4>原型 C-1：自动化管理页</h4>
+  <div class="proto-frame">
+    <div class="proto-titlebar"><div class="proto-dot red"></div><div class="proto-dot yellow"></div><div class="proto-dot green"></div><span class="proto-title">自动化管理</span></div>
+    <div class="proto-content" style="padding:0">
+      <div style="display:flex;min-height:340px">
+        <div style="width:160px;background:var(--gray-50);border-right:1px solid var(--gray-200);padding:12px 0;font-size:12px">
+          <div style="padding:8px 16px;color:var(--gray-400);cursor:pointer">+ 新对话</div>
+          <div style="padding:8px 16px;color:var(--gray-500);cursor:pointer">⚡ 技能中心</div>
+          <div style="padding:8px 16px;background:var(--orange-light);color:var(--orange);font-weight:600;border-left:3px solid var(--orange)">🤖 自动化</div>
+        </div>
+        <div style="flex:1;padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div style="font-size:18px;font-weight:700">自动化</div>
+            <button style="padding:5px 12px;background:var(--orange);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer">+ 创建自动化</button>
+          </div>
+          <div style="border:1px solid var(--gray-200);border-radius:8px;overflow:hidden;font-size:12px">
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;padding:8px 12px;background:var(--gray-100);font-weight:600;color:var(--gray-500);font-size:11px"><span>任务名称</span><span>频率</span><span>上次运行</span><span>状态</span><span></span></div>
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;padding:10px 12px;border-bottom:1px solid var(--gray-100);align-items:center">
+              <span><strong>周报 GMV 归因</strong><br><span style="font-size:10px;color:var(--gray-400)">技能：weekly_gmv_attribution</span></span>
+              <span>每周一 09:00</span>
+              <span style="font-size:11px">04-07 09:01</span>
+              <span><span class="badge badge-success">正常</span></span>
+              <span style="text-align:right"><button style="padding:2px 8px;background:#fff;border:1px solid var(--gray-300);border-radius:4px;font-size:10px;cursor:pointer">编辑</button></span>
+            </div>
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;padding:10px 12px;border-bottom:1px solid var(--gray-100);align-items:center">
+              <span><strong>GMV 异常监控</strong><br><span style="font-size:10px;color:var(--gray-400)">阈值：日环比 > 10%</span></span>
+              <span>每日 08:00</span>
+              <span style="font-size:11px">04-09 08:00</span>
+              <span><span class="badge badge-danger">已触发</span></span>
+              <span style="text-align:right"><button style="padding:2px 8px;background:#fff;border:1px solid var(--gray-300);border-radius:4px;font-size:10px;cursor:pointer">编辑</button></span>
+            </div>
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;padding:10px 12px;align-items:center">
+              <span><strong>转化漏斗日报</strong><br><span style="font-size:10px;color:var(--gray-400)">技能：conversion_funnel</span></span>
+              <span>每日 09:00</span>
+              <span style="font-size:11px">04-09 09:00</span>
+              <span><span class="badge badge-success">正常</span></span>
+              <span style="text-align:right"><button style="padding:2px 8px;background:#fff;border:1px solid var(--gray-300);border-radius:4px;font-size:10px;cursor:pointer">编辑</button></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h4>原型 C-2：从对话创建自动化</h4>
+  <div class="proto-frame">
+    <div class="proto-titlebar"><div class="proto-dot red"></div><div class="proto-dot yellow"></div><div class="proto-dot green"></div><span class="proto-title">从对话创建自动化</span></div>
+    <div class="proto-content">
+      <div class="chat-container">
+        <div class="chat-msg"><div class="chat-avatar ai">A</div>
+          <div style="max-width:75%">
+            <div class="chat-bubble ai"><strong>分析完成</strong><br>上周 GMV 下降 12.3%，核心因子：上海 -21.5%。</div>
+            <div style="display:flex;gap:6px;margin-top:6px">
+              <button style="padding:5px 12px;background:var(--orange-light);color:var(--orange);border:1px solid var(--orange);border-radius:6px;font-size:11px;cursor:pointer">⏰ 设为自动化</button>
+              <button style="padding:5px 12px;background:var(--purple-light);color:var(--purple);border:1px solid var(--purple);border-radius:6px;font-size:11px;cursor:pointer">⚡ 保存为技能</button>
+            </div>
+          </div>
+        </div>
+        <div style="margin:12px 16px;padding:14px;border:2px solid var(--orange);border-radius:var(--radius);background:var(--orange-light)">
+          <div style="font-size:13px;font-weight:600;color:var(--orange);margin-bottom:10px">⏰ 自动化配置</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+            <div><div style="font-size:11px;font-weight:600;margin-bottom:3px">触发方式</div><select style="width:100%;padding:6px;border:1px solid var(--gray-300);border-radius:6px;font-size:12px"><option>定期执行</option><option>阈值触发</option></select></div>
+            <div><div style="font-size:11px;font-weight:600;margin-bottom:3px">执行频率</div><select style="width:100%;padding:6px;border:1px solid var(--gray-300);border-radius:6px;font-size:12px"><option>每周一 09:00</option></select></div>
+            <div><div style="font-size:11px;font-weight:600;margin-bottom:3px">推送渠道</div><select style="width:100%;padding:6px;border:1px solid var(--gray-300);border-radius:6px;font-size:12px"><option>站内通知</option><option>企业微信</option><option>邮件</option></select></div>
+          </div>
+          <button style="padding:6px 16px;background:var(--orange);color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer">创建自动化</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h4>原型 C-3：阈值告警通知</h4>
+  <div class="proto-frame">
+    <div class="proto-titlebar"><div class="proto-dot red"></div><div class="proto-dot yellow"></div><div class="proto-dot green"></div><span class="proto-title">阈值告警通知</span></div>
+    <div class="proto-content">
+      <div style="padding:16px">
+        <div style="border:1px solid var(--danger);border-radius:var(--radius);padding:14px;background:#fff">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+            <span style="width:8px;height:8px;border-radius:50%;background:var(--danger)"></span>
+            <strong style="font-size:13px">⚠️ 阈值告警 + 自动归因</strong>
+            <span style="font-size:10px;color:var(--gray-400);margin-left:auto">今天 14:30</span>
+          </div>
+          <div style="font-size:12px;color:var(--gray-600);margin-bottom:6px">
+            <strong>GMV 日环比降幅超过 10%</strong>（阈值触发）<br>
+            今日 GMV 较昨日下降 <span style="color:var(--danger)">-14.7%</span>。自动归因：杭州区域异常（-32%），疑似系统故障。
+          </div>
+          <div style="display:flex;gap:6px">
+            <button style="padding:5px 12px;background:var(--danger);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer">查看详情</button>
+            <span style="padding:5px 12px;font-size:11px;color:var(--gray-400)">已推送至企微群</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- =========================================================== -->
+<!-- PART 2: 功能点说明 -->
+<!-- =========================================================== -->
+<div class="part-divider">
+  <h2>🔧 功能点说明</h2>
+  <p>按过程透明 · 技能 · 自动化 · 质量保障四维展开</p>
+</div>
+
+<!-- S8: 过程透明 -->
+<div class="section" id="s8">
+  <h2>8 过程透明</h2>
+
+  <h3>8.1 三栏分屏布局</h3>
+  <p><strong>方案：</strong>Chat + Process + Artifacts 三栏布局，步骤进度和可视化产出各有独立展示空间。</p>
+  <div class="ascii-diagram">┌────────────────────────────────────────────────────────────────────────────┐
+│  Header：项目名 + 数据源状态 + 用户信息                                      │
+├───────────────────────────────────┬────────────────────────────────────────┤
+│                                   │  Tab: [Process] [Artifacts]            │
+│  对话区 (Chat Panel)               │                                        │
+│                                   │  Process 面板：步骤列表 + 选中详情       │
+│  · 用户消息                        │  · 全局进度一屏可见                     │
+│  · AI 分析计划（含注入上下文展示）  │  · 点击展开代码/数据                    │
+│  · 步骤单行摘要（可点击定位右侧）   │                                        │
+│  · AI 结论回复                     │  Artifacts 面板：可视化输出             │
+│                                   │  · 图表（ECharts 渲染）                 │
+│  ┌─ 输入区 ──────────────────┐   │  · 数据表（交互式排序筛选）             │
+│  │ [⇌确认] [      输入框    ↑]  │  · 指标卡片                             │
+│  └────────────────────────────┘  │                                        │
+├───────────────────────────────────┴────────────────────────────────────────┤
+│  左右比例: 60% : 40%（可拖拽）· 简单问题不展开右侧 · 3+步自动展开          │
+└────────────────────────────────────────────────────────────────────────────┘</div>
+
+  <h4>面板展开/收起逻辑</h4>
+  <table>
+    <tr><th>场景</th><th>右侧面板</th><th>理由</th></tr>
+    <tr><td>简单查询（1-2 步，无图表）</td><td>收起，结果内联在对话区</td><td>信息量少，无需分屏</td></tr>
+    <tr><td>复杂分析（3+ 步）</td><td>自动展开 Process Tab</td><td>用户需要全局进度视图</td></tr>
+    <tr><td>步骤产生图表/可视化</td><td>自动切到 Artifacts Tab</td><td>图表需要更大展示空间</td></tr>
+    <tr><td>用户手动点击</td><td>随时展开/收起</td><td>用户控制优先</td></tr>
+  </table>
+
+  <h3>8.2 分析计划</h3>
+  <p><strong>核心概念：</strong>模型思考后先输出「分析计划」卡片，包含技能链、步骤列表和已注入上下文展示。用户可通过输入区 toggle（session 级，默认 OFF）开启执行前确认模式。</p>
+  <div class="callout callout-info"><strong>分析计划 = 技能链 + 步骤列表 + 已注入的上下文（数据 + 数据说明）</strong>用户通过折叠区块查看 Agent 注入了哪些上下文，判断是否适用于当前问题。如有误，在对话中自然语言补充。</div>
+
+  <h3>8.3 上下文组装（迭代 A）</h3>
+  <p>上下文 = <strong>数据 + 数据说明</strong>，在模型思考前由系统代码统一组装并注入系统指令。</p>
+
+  <!-- <h4>上下文来源 ① 数据（自动提取）</h4>
+  <table>
+    <tr><th>上下文类型</th><th>示例</th><th>提取方式</th></tr>
+    <tr><td>数据 Schema</td><td>gmv_weekly 看板数据: 7 列 × 35 行</td><td>选择看板后通过查数接口获取</td></tr>
+    <tr><td>列名与类型</td><td>city(string), gmv(float), date(date)</td><td>查数接口返回 Schema</td></tr>
+    <tr><td>数据特征</td><td>日期范围 3/31-4/6, 5 个城市, 3 个品类</td><td>从查数结果自动统计</td></tr>
+    <tr><td>数据质量</td><td>无缺失值, gmv 列有 2 个异常值</td><td>从查数结果自动检测</td></tr>
+  </table>
+
+  <h4>上下文来源 ② 数据说明（配置管理）</h4>
+  <p>数据说明范围：<strong>指标维度定义、时间范围、筛选范围。</strong>通过后台接口统一获取，不设独立配置入口。用户如需补充，在对话中用自然语言说明即可。</p>
+  <table>
+    <tr><th>上下文类型</th><th>示例</th><th>来源</th></tr>
+    <tr><td>指标维度定义</td><td>GMV = 订单金额合计；转化率 = 下单UV / 访问UV；城市维度层级：省→市；品类维度：一级品类</td><td>后台接口</td></tr>
+    <tr><td>时间范围</td><td>数据粒度=日；业务周期=自然周（周一~周日）；大促期 15-17 号</td><td>后台接口</td></tr>
+    <tr><td>筛选范围</td><td>排除测试账号数据；排除内部员工订单</td><td>后台接口</td></tr>
+  </table>
+
+  <div class="callout callout-warning"><strong>数据说明 vs 技能的边界：</strong>数据说明 = 事实性背景（指标怎么算、维度怎么分、数据怎么筛）。技能 = 分析策略（拆解哪些维度、异常阈值多少、对比周期用周环比还是月环比）。</div> -->
+
+  <h4>注入上下文示例</h4>
+  <table>
+    <tr><th>类别</th><th>示例内容</th></tr>
+    <tr><td><strong>数据</strong></td><td>数据来源：机油-规格码-APP转化 看板（7列×35行）<br>列信息：date, city, category, gmv, orders…<br>数据范围：2026-03-31 ~ 04-06，5 城市，3 品类<br>数据质量：无缺失值</td></tr>
+    <tr><td><strong>数据说明</strong></td><td>指标定义：GMV = 订单金额合计；转化率 = 下单UV / 访问UV<br>维度定义：城市（省→市）、品类（一级）<br>时间范围：日粒度，业务周=周一~周日<br>筛选范围：排除测试账号和内部员工订单</td></tr>
+  </table>
+
+<!-- 
+
+  <h3>8.4 代码执行与错误处理</h3>
+  <p>数据分析 Agent 的核心能力之一是生成并执行代码（Python）完成数据计算和可视化。以下规则定义代码执行的产品行为。</p>
+  <table>
+    <tr><th>场景</th><th>产品规则</th><th>用户感知</th></tr>
+    <tr><td><strong>正常执行</strong></td><td>代码在沙箱中运行，每步限时 30 秒，超时自动终止</td><td>Process 面板显示执行状态（运行中 / 完成 / 失败）</td></tr>
+    <tr><td><strong>代码报错</strong></td><td>模型自动重试（最多 2 次），每次根据错误信息修正代码后重新执行</td><td>Process 面板显示「正在修正…」，重试成功后正常展示结果；全部失败则展示错误摘要</td></tr>
+    <tr><td><strong>全部重试失败</strong></td><td>该步骤标记为失败，模型在结论中说明该步未完成及原因，继续完成其余可完成的步骤</td><td>失败步骤在 Process 面板标红，Chat 区提示用户可调整问题后重试</td></tr>
+    <tr><td><strong>数据量超限</strong></td><td>单次查询返回行数超过阈值（默认 10,000 行）时，模型自动采样或聚合后再计算</td><td>Process 面板提示「数据量较大，已自动采样/聚合」</td></tr>
+    <tr><td><strong>安全限制</strong></td><td>沙箱禁止网络访问、文件系统写入、系统命令执行。仅允许数据计算和可视化相关操作</td><td>用户无感知（违规代码静默失败，模型重新生成合规代码）</td></tr>
+  </table>
+  <div class="callout callout-warning"><strong>迭代演进：</strong>A 期模型自动重试 + 用户兜底；B 期根据评测数据优化重试策略和错误提示文案；C 期自动化场景下失败步骤触发告警通知任务创建者。</div> -->
+
+  <h3>8.5 步骤标签体系</h3>
+  <p>模型自由规划步骤（做什么、做几步），每步输出时附带一个 <code>step_label</code> 用于结构化展示和质量追踪。</p>
+  <div class="callout callout-info"><strong>A 期策略：自由文本标签。</strong>模型在每步输出时自拟标签（如「加载数据」「按城市拆解」「生成结论」），不强制 enum 枚举。系统根据标签文本做 UI 渲染（选择图标和展示格式）和可观测性聚合。B 期根据 A 期积累的实际标签数据，评估是否需要标准化为固定枚举值。</div>
+  <table>
+    <tr><th>标签用途</th><th>A 期实现</th><th>B 期演进</th></tr>
+    <tr><td><strong>UI 渲染</strong></td><td>根据标签关键词匹配图标（如含「数据」→ 📥，含「趋势」→ 📈，含「结论」→ 💡，其他 → ⚙️）</td><td>若标准化，按 enum 精确匹配</td></tr>
+    <tr><td><strong>约束校验</strong></td><td>全局规则统一校验，不按标签区分</td><td>评估是否需要按标签类型适用不同校验规则</td></tr>
+    <tr><td><strong>可观测性</strong></td><td>按标签文本聚合步骤耗时和质量</td><td>标准化后聚合更精确</td></tr>
+  </table>
+
+
+  <h3>8.6 Artifacts 面板</h3>
+  <p>模型根据分析内容自然选择输出格式。</p>
+
+  <h4>Artifacts 面板支持的类型</h4>
+  <table>
+    <tr><th>类型</th><th>来源步骤</th><th>展示形态</th><th>迭代</th></tr>
+    <tr><td><strong>chart</strong></td><td>visualize / trend / breakdown</td><td>柱状图、折线图等可视化图表</td><td><span class="badge badge-primary">A</span></td></tr>
+    <tr><td><strong>table</strong></td><td>compute / breakdown</td><td>交互式数据表（支持排序、筛选）</td><td><span class="badge badge-primary">A</span></td></tr>
+    <tr><td><strong>metric</strong></td><td>compute</td><td>大数字卡片（指标名 + 值 + 变化率）</td><td><span class="badge badge-primary">A</span></td></tr>
+    <tr><td><strong>report</strong></td><td>conclude</td><td>结构化分析报告（可导出 PDF）</td><td><span class="badge badge-primary">A</span></td></tr>
+  </table>
+
+  <h3>8.7 结果呈现方式</h3>
+  <p>简单查询在对话区内联回答（不展开右侧面板），复杂分析自动展开 Process + Artifacts 面板。</p>
+</div>
+
+<!-- S9: 技能系统 -->
+<div class="section" id="s9">
+  <h2>9 技能系统</h2>
+  <p>技能定义「做什么分析、怎么做、输出约束是什么」。技能 = 一套结构化的 function calling schema，告诉模型可以调用哪些分析能力、需要什么参数、输出须满足什么约束。</p>
+
+  <h3>9.1 技能结构定义</h3>
+ 
+
+  <h4>技能结构 = 名称 + 描述 + 分析步骤描述 + 参数定义 + 约束</h4>
+  <table>
+    <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+    <tr><td><code>skill_id</code></td><td>string</td><td>是</td><td>唯一标识，如 <code>conversion_attribution</code></td></tr>
+    <tr><td><code>name</code></td><td>string</td><td>是</td><td><strong>名称。</strong>展示在技能选择器中。如「保养机油转化分析」</td></tr>
+    <tr><td><code>description</code></td><td>string</td><td>是</td><td><strong>描述。</strong>技能功能描述，B 期自动匹配的核心依据。包含：适用场景 + 分析目标 + 典型问法</td></tr>
+    <tr><td><code>analysis_steps</code></td><td>object[]</td><td>是</td><td><strong>分析步骤描述。</strong>有序步骤列表，每步包含 step_description（做什么）+ method（分析方法标签）。模型据此生成分析计划</td></tr>
+    <tr><td><code>parameters</code></td><td>object</td><td>否</td><td><strong>参数定义。</strong>技能需要的输入参数（JSON Schema 格式）。包括拆解维度、对比周期、异常阈值等分析策略类参数。每个参数含 type、description、default</td></tr>
+    <tr><td><code>constraints</code></td><td>string[]</td><td>否</td><td><strong>约束/限定。</strong>输出约束规则，如「必须量化贡献占比」「必须给出行动建议」「异常定义：环比 >10%」</td></tr>
+    <tr><td><code>validation_rules</code></td><td>object[]</td><td>否</td><td><strong>技能级校验规则。</strong>与系统指令中的全局约束互补：全局约束对所有分析生效（如「结论必须包含行动建议」），validation_rules 定义该技能特有的校验逻辑（如「归因分析必须覆盖 Top3 维度」）。A/B 期由人工评测驱动补充，C 期供系统代码自动校验使用</td></tr>
+    <tr><td><code>version</code></td><td>string</td><td>是</td><td>技能版本号，用于追踪和评测</td></tr>
+  </table>
+
+  <h4>技能示例：保养机油转化分析</h4>
+  <table>
+    <tr><th>字段</th><th>内容</th></tr>
+    <tr><td><strong>名称</strong></td><td>保养机油转化分析</td></tr>
+    <tr><td><strong>描述</strong></td><td>分析转化率变化原因，按流量来源拆解并下钻定位异常。适用于「转化率为什么下降了」「哪个渠道转化有问题」</td></tr>
+    <tr><td><strong>分析步骤</strong></td><td>① 确认整体转化率下降数据 → ② 按流量来源拆解 Top 5 → ③ 异常来源下钻 → ④ 计算各来源 UV 价值 → ⑤ 结论与建议</td></tr>
+    <tr><td><strong>参数</strong></td><td>报警指标（默认：端转）、拆解维度（默认：流量来源）、过滤条件、时间范围（默认：近 3 月）、异常阈值（默认：10%）</td></tr>
+    <tr><td><strong>约束</strong></td><td>必须给环比数值、必须量化贡献占比、必须给行动建议、异常定义：环比 >10%</td></tr>
+    <tr><td><strong>校验规则</strong></td><td>归因分析须覆盖 Top3 维度、拆解占比之和须 = 100%（技能特有规则，与全局约束互补）</td></tr>
+  </table>
+
+  
+  <h3>9.2 参数提取机制</h3>
+  <p>用户选定技能后，模型需要从用户的自然语言问题中提取参数值填入技能的 parameters。</p>
+
+  <h4>参数提取流程</h4>
+  <table>
+    <tr><th>步骤</th><th>说明</th><th>示例</th></tr>
+    <tr><td>1. 用户提问</td><td>自然语言问题 + 已选技能</td><td>「帮我看下上周各城市的 GMV 变化」+ 已选「周报 GMV 归因」</td></tr>
+    <tr><td>2. 模型提取</td><td>模型根据 function schema 中各参数的 description，从用户问题中提取对应值</td><td>识别 focus_metric=GMV, breakdown_dims=[城市], compare_period=周环比</td></tr>
+    <tr><td>3. 默认填充</td><td>用户未明确提及的参数，使用 schema 中的 default 值</td><td>anomaly_threshold 未提及 → 使用默认值 10</td></tr>
+    <tr><td>4. 上下文补充</td><td>部分参数可从数据上下文中推断</td><td>数据中有 city、category 列 → 推断可用拆解维度</td></tr>
+    <tr><td>5. 展示确认</td><td>提取的参数展示在分析计划中，用户可在确认模式下修改</td><td>分析计划卡片中列出所有参数及其值</td></tr>
+  </table>
+
+  <h4>参数来源优先级</h4>
+  <table>
+    <tr><th>优先级</th><th>来源</th><th>说明</th></tr>
+    <tr><td>1（最高）</td><td>用户显式指定</td><td>用户在问题中明确提到的参数值，如「按城市维度」</td></tr>
+    <tr><td>2</td><td>技能默认值</td><td>技能 parameters 中定义的 default 值</td></tr>
+    <tr><td>3（最低）</td><td>数据上下文推断</td><td>从数据 Schema 中推断，如数据中有 city 列 → 可用于拆解</td></tr>
+  </table>
+
+  <div class="callout callout-info"><strong>参数提取的质量评测</strong>
+  评测集中每个 Case 都包含 <code>expected_params</code> 字段（见第 11 节），用于量化参数提取准确率。准确率 = 正确提取的参数数 / 技能总参数数。迭代 A 目标：手选技能场景下参数准确率 ≥ 80%。</div>
+
+  <h3>9.3 技能调用场景</h3>
+  <table>
+    <tr><th>场景</th><th>用户操作</th><th>模型行为</th><th>迭代</th></tr>
+    <tr><td>手选技能</td><td>输入区选择「周报 GMV 归因」+ 提问</td><td>按选定技能的 schema 提取参数 → 生成分析计划 → 执行</td><td><span class="badge badge-primary">A</span></td></tr>
+    <tr><td>自由分析</td><td>不选技能，直接提问「这份数据有什么发现？」</td><td>不调用 function，模型按系统指令中的复杂度判断指令自行决定是简单回答还是生成分析计划</td><td><span class="badge badge-primary">A</span></td></tr>
+    <tr><td>自动匹配</td><td>不选技能，提问「分析上周 GMV 下降原因」</td><td>function calling 自动选择 weekly_gmv_attribution</td><td><span class="badge badge-success">B</span></td></tr>
+    <tr><td>多技能编排</td><td>提问「检测异常并归因」</td><td>分析计划中安排 anomaly_detection → weekly_gmv_attribution 串行</td><td><span class="badge badge-success">B</span></td></tr>
+  </table>
+
+  <h3>9.4 从现有报告沉淀技能（迭代 B）</h3>
+  <p>业务团队已有大量周报/月报等分析报告，其分析逻辑可以反向提取为技能定义，降低技能创建门槛。</p>
+  <table>
+    <tr><th>步骤</th><th>操作</th><th>产出</th></tr>
+    <tr><td><strong>1. 上传报告</strong></td><td>用户在技能中心点击「从现有报告沉淀技能」，上传一份或多份已有的分析报告（Excel/PDF/截图）</td><td>报告内容</td></tr>
+    <tr><td><strong>2. 结构提取</strong></td><td>模型自动解析报告，识别分析步骤（数据来源 → 计算逻辑 → 拆解维度 → 结论模式）和隐含参数</td><td>技能草稿（含名称、描述、步骤、参数、约束）</td></tr>
+    <tr><td><strong>3. 人工校审</strong></td><td>用户在技能编辑器中审核和修改草稿，补充模型未识别的业务规则</td><td>完整技能定义</td></tr>
+    <tr><td><strong>4. 验证测试</strong></td><td>用户用真实问题测试新技能，确认输出符合预期后发布</td><td>可用技能</td></tr>
+  </table>
+  
+</div>
+
+<!-- S10: 自动化 -->
+<div class="section" id="s10">
+  <h2>10 自动化</h2>
+  <p>自动化全部在迭代 C 落地：手动创建 + 从对话创建 + 定期执行 + 阈值触发 + 推送通知。</p>
+<!-- 
+  <h3>10.1 定时执行 + 站内推送（迭代 C）</h3>
+  <table>
+    <tr><th>功能</th><th>描述</th></tr>
+    <tr><td><strong>定时执行</strong></td><td>用户可为分析设置 cron 定时（每日/每周），到时间后自动运行。复用同一条分析链路（上下文组装→模型思考→执行→结果交付）。</td></tr>
+    <tr><td><strong>站内推送</strong></td><td>自动执行完成后推送通知 + 结果摘要到平台消息中心。</td></tr>
+  </table>
+
+  <h3>10.2 阈值触发 + 企微/邮件推送（迭代 C）</h3>
+  <div class="qa-block">
+    <div class="qa-q">问题：定时执行只能按固定频率运行，无法在业务异常发生时立即响应</div>
+    <div class="qa-a">
+      <p><strong>方案：阈值触发 + 多渠道推送，实现异常自动响应。</strong></p>
+
+      <h4 style="margin-top:12px">① 阈值触发</h4>
+      <p><strong>业界做法：</strong>Metabase 支持三种告警（定时/阈值越线/进度条目标达成）；DataDog 每分钟评估一次指标，支持阈值、异常检测、日志告警。</p>
+      <table>
+        <tr><th>环节</th><th>说明</th></tr>
+        <tr><td>监控规则配置</td><td>用户配置：监控指标 + 触发条件（>、<、变化率）+ 阈值 + 检查频率</td></tr>
+        <tr><td>定期评估</td><td>系统按配置频率查询最新数据，对比阈值，判断是否触发</td></tr>
+        <tr><td>触发动作</td><td>自动发起一次分析（匹配对应技能，如归因分析），并推送结果</td></tr>
+      </table>
+      <p>示例：「GMV 日环比降幅 > 10% 时，自动运行归因分析，结果推送到企微群」。</p>
+
+      <h4 style="margin-top:12px">② 多渠道推送</h4>
+      <table>
+        <tr><th>渠道</th><th>推送内容</th></tr>
+        <tr><td>站内通知</td><td>标题 + 摘要 + 查看链接</td></tr>
+        <tr><td>企业微信</td><td>摘要 + 关键数据 + 链接</td></tr>
+        <tr><td>邮件</td><td>图表截图 + 结果摘要 + 链接</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3>10.3 自动化任务生命周期</h3>
+  <p>每个自动化任务遵循以下状态流转：</p>
+  <table>
+    <tr><th>状态</th><th>含义</th><th>用户操作</th><th>系统行为</th></tr>
+    <tr><td><strong>草稿</strong></td><td>任务已创建但未配置完成</td><td>编辑任务配置（技能、参数、触发条件、推送渠道）</td><td>不执行</td></tr>
+    <tr><td><strong>已启用</strong></td><td>任务配置完成并激活</td><td>可随时暂停或编辑</td><td>按触发条件（定时/阈值）自动执行</td></tr>
+    <tr><td><strong>运行中</strong></td><td>任务正在执行分析</td><td>可查看实时进度</td><td>执行完整分析链路，完成后推送结果</td></tr>
+    <tr><td><strong>已暂停</strong></td><td>用户手动暂停</td><td>可恢复或删除</td><td>停止触发，保留配置和历史记录</td></tr>
+    <tr><td><strong>已失败</strong></td><td>最近一次执行失败</td><td>查看失败原因，修改配置后重试</td><td>通知任务创建者，自动重试 1 次后暂停</td></tr>
+    <tr><td><strong>已删除</strong></td><td>用户删除任务</td><td>—</td><td>停止触发，保留历史执行记录 30 天</td></tr>
+  </table>
+  <div class="callout callout-info"><strong>任务管理入口：</strong>在左侧导航的「自动化」页面统一管理所有任务，支持按状态筛选、查看执行历史、批量启用/暂停。</div> -->
+</div>
+
+<!-- S11: 质量保障 -->
+<div class="section" id="s11">
+  <h2>11 质量保障</h2>
+  <p>包含三个层次：约束规则体系（定义质量底线）、可观测性（记录过程数据）、评测体系（衡量质量）。评测发现问题 → 补充约束规则 → 回归验证效果。</p>
+
+  <h3>11.0 三层质量机制总览</h3>
+  
+  <table>
+    <tr><th>层次</th><th>名称</th><th>什么时候运行</th><th>谁来做</th><th>解决什么问题</th><th>迭代</th></tr>
+    <tr>
+      <td style="font-size:20px;text-align:center">1</td>
+      <td><strong style="color:var(--gray-700)">运行时防护</strong></td>
+      <td>每步执行后，实时</td>
+      <td><strong>系统代码</strong>（确定性逻辑，不调用大模型）</td>
+      <td>快速拦截明显错误：数据范围越界、步骤数过多、数值不一致</td>
+      <td><span class="badge badge-primary">A</span></td>
+    </tr>
+    <tr>
+      <td style="font-size:20px;text-align:center">2</td>
+      <td><strong style="color:var(--teal)">结论反思</strong></td>
+      <td>结论生成后，交付前</td>
+      <td><strong>同一个大模型</strong>额外调用一次</td>
+      <td>自检结论质量：是否完整回答问题、数值是否与计算结果一致、是否有行动建议</td>
+      <td><span class="badge badge-success">B</span></td>
+    </tr>
+    <tr>
+      <td style="font-size:20px;text-align:center">3</td>
+      <td><strong style="color:var(--danger)">离线评测</strong></td>
+      <td>结果交付后，异步</td>
+      <td><strong>独立的评估 Agent</strong>（另一个大模型，LLM-as-Judge）</td>
+      <td>全面评估分析质量，6 维度评分，积累质量数据，驱动规则优化</td>
+      <td><span class="badge badge-purple">C</span></td>
+    </tr>
+  </table>
+
+  <h3>11.1 约束规则体系</h3>
+  <p>A 期：预制基础约束（安全相关）</strong>；B 期：而是通过评测积累数据、迭代 Prompt 规则。 C 期：补充自动校验逻辑</p>
+<!-- 
+  <h4>两层约束架构</h4>
+  <table>
+    <tr><th>层级</th><th>机制</th><th>规则存放</th><th>迭代</th><th>为什么需要</th></tr>
+    <tr><td><strong>基础约束</strong></td><td>代码强制 + 系统指令注入</td><td>安全规则：沙箱/权限配置<br>质量规则：System Prompt</td><td><span class="badge badge-primary">A</span></td><td>安全底线 + 质量引导，不做无法上线</td></tr>
+    <tr><td><strong>自动校验</strong></td><td>系统代码拦截校验</td><td>校验规则来自评测沉淀</td><td><span class="badge badge-purple">C</span></td><td>自动化执行无人值守，需要系统兜底质量</td></tr>
+  </table> -->
+  <!-- <div class="callout callout-info"><strong>B 期不建校验架构，而是迭代 Prompt 规则</strong>
+  B 期有用户在线盯着结果，不需要系统自动校验。B 期的约束优化是：跑评测 → 发现高频问题 → 在系统指令中增补 1 条 Prompt 规则 → 再跑评测验证 ROI → 达标才保留。这个闭环只改 Prompt，不需要工程架构。</div> -->
+
+  <h4>规则存放位置说明</h4>
+  <p>不同类型的规则存放在不同位置，由系统代码在运行时统一加载和执行：</p>
+  <table>
+    <tr><th>规则类型</th><th>存放位置</th><th>执行方式</th><th>示例</th></tr>
+    <tr><td><strong>安全规则</strong></td><td>系统配置（代码级）</td><td>系统代码强制执行，大模型无法绕过</td><td>沙箱禁止外网访问、数据按权限过滤</td></tr>
+    <tr><td><strong>全局质量规则</strong></td><td>System Prompt</td><td>注入系统指令引导大模型遵守</td><td>数值结论须标注数据来源、不确定时声明置信度</td></tr>
+    <tr><td><strong>技能级校验规则</strong></td><td>技能定义（validation_rules 字段）</td><td>A/B 期引导模型，C 期系统代码自动校验</td><td>归因分析须覆盖 Top3 维度、拆解占比之和须 = 100%</td></tr>
+  </table>
+
+  <h4>A 期基础约束（最小规则集）</h4>
+  <p>先跑通链路，再逐条添加约束。每新增 1 条规则，跑评测集量化 ROI 后决定是否保留。</p>
+  <table>
+    <tr><th>#</th><th>规则</th><th>类型</th><th>产品行为</th></tr>
+    <tr><td>C1</td><td>查询范围限制</td><td>代码强制</td><td>Agent 只能访问当前 Session 关联的数据</td></tr>
+    <tr><td>C3</td><td>访问合规</td><td>代码强制</td><td>数据访问按用户权限过滤</td></tr>
+    <tr><td>C4</td><td>输出确定性</td><td>代码强制</td><td>数值结论须与实际执行结果一致</td></tr>
+    <tr><td>P1</td><td>不确定性声明</td><td>Prompt 引导</td><td>数据不足时标注置信度并说明原因</td></tr>
+    <tr><td>P2</td><td>数据引用</td><td>Prompt 引导</td><td>数值结论标注数据来源</td></tr>
+    <tr><td>P3</td><td>已定义指标优先</td><td>Prompt 引导</td><td>优先使用业务上下文中的指标公式</td></tr>
+    <tr><td>P4</td><td>粒度感知</td><td>Prompt 引导</td><td>拆解时明确数据粒度，避免混淆</td></tr>
+    <tr><td>P5</td><td>复杂度自判断</td><td>Prompt 引导</td><td>简单查询直接回答，复杂问题走分析计划</td></tr>
+  </table>
+
+  <h4>B 期 Prompt 规则演进（候选，需评测验证 ROI）</h4>
+  <table>
+    <tr><th>候选规则</th><th>预期效果</th><th>验证方式</th></tr>
+    <tr><td>拆解步骤必须量化占比</td><td>提升分析完整度</td><td>评测集中 analysis_completeness 通过率</td></tr>
+
+    <tr><td>异常数据必须标注</td><td>提升数据完整性</td><td>抽检异常标注覆盖率</td></tr>
+    <tr><td>计划步骤数不超过 8 步</td><td>防止过度分析</td><td>平均步骤数 + 用户满意度</td></tr>
+    <tr><td>同一维度不重复拆解</td><td>减少冗余步骤</td><td>评测集中冗余步骤占比</td></tr>
+  </table>
+
+  <h4>C 期自动校验（随自动化上线）</h4>
+  <p>当分析由定时任务或阈值触发自动执行时，没有用户实时查看结果。此时需要系统代码在关键节点做规则检查：</p>
+  <table>
+    <tr><th>校验点</th><th>校验内容</th><th>不通过处理</th></tr>
+    <tr><td>计划输出后</td><td>步骤数合理、包含结论步骤</td><td>追加失败原因 → 重试 1 次</td></tr>
+    <tr><td>每步执行后</td><td>数值与代码执行结果一致</td><td>记录告警 → 继续执行</td></tr>
+    <tr><td>结论产出后</td><td>包含数据引用、行动建议</td><td>标记低分 → 推送时附带质量提示</td></tr>
+  </table>
+  <p>校验规则来自 B 期评测沉淀的、已验证有效的 Prompt 规则，转化为可代码判定的检查项。</p>
+
+  <h3>11.2 评测体系 + 测试集模板</h3>
+  <h4>评测维度</h4>
+  <table>
+    <tr><th>维度</th><th>权重</th><th>Pass 标准</th></tr>
+    <tr><td>数值精度</td><td>20%</td><td>百分比有基数，金额有千分位</td></tr>
+    <tr><td>分析完整度</td><td>20%</td><td>趋势 + 维度拆解 + 量化</td></tr>
+    <tr><td>结论质量</td><td>20%</td><td>回答"为什么" + 有行动建议</td></tr>
+    <tr><td>数据完整性</td><td>15%</td><td>标注缺失/异常值</td></tr>
+    <tr><td>技能匹配</td><td>15%</td><td>选对技能 + 参数 ≥80% 准确</td></tr>
+    <tr><td>步骤标签</td><td>10%</td><td>标签与实际内容匹配</td></tr>
+  </table>
+
+  
+  
+
+  <h4>必填列（每行必须有）</h4>
+  <table>
+    <tr><th>列名</th><th>类型</th><th>说明</th><th>示例</th></tr>
+    <tr><td><code>case_id</code></td><td>string</td><td>唯一标识</td><td><code>A-001</code></td></tr>
+    <tr><td><code>category</code></td><td>string</td><td>场景分类：skill_match / free_analysis / simple_query / multi_skill</td><td><code>skill_match</code></td></tr>
+    <tr><td><code>user_query</code></td><td>string</td><td>用户输入的自然语言问题</td><td>「上周 GMV 下降了，按城市分析原因」</td></tr>
+    <tr><td><code>mock_data_file</code></td><td>string</td><td>模拟数据文件路径（CSV），用于实际执行</td><td><code>data/gmv_weekly_5city.csv</code></td></tr>
+    <tr><td><code>expected_skill</code></td><td>string</td><td>期望匹配的技能名（无匹配填 <code>none</code>）</td><td><code>weekly_gmv_attribution</code></td></tr>
+    <tr><td><code>expected_params</code></td><td>JSON</td><td>期望提取的参数键值对</td><td><code>{"focus_metric":"GMV","breakdown_dims":["城市"]}</code></td></tr>
+    <tr><td><code>expected_step_labels</code></td><td>array</td><td>期望的步骤标签序列</td><td><code>["data_load","compute","breakdown","conclude"]</code></td></tr>
+    <tr><td><code>expected_output_keywords</code></td><td>array</td><td>结论中必须包含的关键信息点</td><td><code>["环比","城市","贡献","建议"]</code></td></tr>
+    <tr><td><code>difficulty</code></td><td>string</td><td>easy / medium / hard</td><td><code>medium</code></td></tr>
+  </table>
+
+  <h4>评分列（Judge 或人工填写）</h4>
+  <table>
+    <tr><th>列名</th><th>类型</th><th>说明</th></tr>
+    <tr><td><code>skill_match_correct</code></td><td>boolean</td><td>技能是否匹配正确</td></tr>
+    <tr><td><code>param_accuracy</code></td><td>float 0-1</td><td>参数提取准确率（正确参数数/总参数数）</td></tr>
+    <tr><td><code>numerical_precision</code></td><td>Pass/Fail</td><td>数值精度（百分比有基数、金额格式正确）</td></tr>
+    <tr><td><code>analysis_completeness</code></td><td>Pass/Fail</td><td>分析完整度（趋势+拆解+量化）</td></tr>
+    <tr><td><code>conclusion_quality</code></td><td>Pass/Fail</td><td>结论质量（回答"为什么"+行动建议）</td></tr>
+    <tr><td><code>step_label_accuracy</code></td><td>float 0-1</td><td>步骤标签匹配度</td></tr>
+    <tr><td><code>overall_score</code></td><td>float 0-1</td><td>加权总分</td></tr>
+    <tr><td><code>judge_type</code></td><td>string</td><td>human / llm_judge</td></tr>
+    <tr><td><code>notes</code></td><td>string</td><td>评审备注</td></tr>
+  </table>
+
+  <h4>示例 Case</h4>
+  <table>
+    <tr><th>字段</th><th>值</th></tr>
+    <tr><td>case_id</td><td>A-001</td></tr>
+    <tr><td>user_query</td><td>「上周 GMV 下降了，按城市和品类帮我分析下原因」</td></tr>
+    <tr><td>expected_skill</td><td>weekly_gmv_attribution</td></tr>
+    <tr><td>expected_params</td><td>focus_metric=GMV, breakdown_dims=[城市, 品类], compare_period=周环比</td></tr>
+    <tr><td>expected_step_labels</td><td>data_load → compute → breakdown → breakdown → conclude</td></tr>
+    <tr><td>expected_output_keywords</td><td>环比、城市、品类、贡献、建议</td></tr>
+    <tr><td>difficulty</td><td>medium</td></tr>
+  </table>
+
+  <!-- <h3>11.3 评测闭环运作方式</h3>
+  <p>评测不是一次性动作，而是持续改进循环。B 期和 C 期的闭环驱动力不同：</p>
+
+  <h4>B 期：人工驱动的 Prompt 迭代闭环</h4>
+  <table>
+    <tr><th>步骤</th><th>执行者</th><th>动作</th><th>产出</th></tr>
+    <tr><td>1. 抽检</td><td>PM</td><td>每周从可观测性数据中抽取 20-30 个 Case，按评测维度打分</td><td>评分表 + 高频问题清单</td></tr>
+    <tr><td>2. 归因</td><td>PM</td><td>分析 Fail Case 的根因：是缺少约束规则、技能参数不对、还是模型能力不足</td><td>改进假设（如「缺少拆解须量化占比的规则」）</td></tr>
+    <tr><td>3. 拟定规则</td><td>PM</td><td>将改进假设转化为 1 条具体的 Prompt 规则</td><td>新规则草稿</td></tr>
+    <tr><td>4. 验证 ROI</td><td>PM + 研发</td><td>在评测集上对比有/无该规则的评分差异，提升 ≥5% 才保留</td><td>规则 ROI 报告</td></tr>
+    <tr><td>5. 上线</td><td>研发</td><td>规则写入系统指令，更新评测集基线</td><td>系统指令版本 +1</td></tr>
+  </table>
+  <div class="callout callout-info"><strong>节奏：</strong>B 期预计每 1-2 周完成一轮闭环，每轮新增 1-3 条规则。目标是 B 期结束时整体评测 Pass Rate 从 A 期的 60% 提升到 80%+。</div>
+
+  <h4>C 期：自动驱动的持续评测闭环</h4>
+  <table>
+    <tr><th>步骤</th><th>执行者</th><th>动作</th><th>产出</th></tr>
+    <tr><td>1. 自动评测</td><td>系统（独立评估 Agent）</td><td>每次自动化任务执行后，LLM-as-Judge（独立大模型）自动按评测维度打分</td><td>自动评分结果</td></tr>
+    <tr><td>2. 异常检测</td><td>系统</td><td>评分低于阈值（如 &lt;0.6）自动标记为异常 Case</td><td>异常 Case 队列</td></tr>
+    <tr><td>3. 人工复核</td><td>PM</td><td>每周复核异常 Case，确认是 Judge 误判还是真实质量问题</td><td>确认后的问题清单</td></tr>
+    <tr><td>4. 规则迭代</td><td>PM + 研发</td><td>同 B 期流程：拟定规则 → 验证 ROI → 上线</td><td>系统指令 / 校验规则更新</td></tr>
+  </table>
+  <div class="callout callout-info"><strong>与 B 期的区别：</strong>B 期的抽检和打分是人工完成的，C 期的抽检和打分由独立的评估 Agent（LLM-as-Judge）自动完成，人工只需复核异常 Case。评测效率从「每周 20-30 个」提升到「全量自动评测」。</div>
+
+  <h3>11.4 可观测性数据规范</h3>
+  <div class="callout callout-info"><strong>PM 定义「记什么」，开发选型「用什么记」。</strong>这份规范定义评测和质量分析所需的数据字段。如果 PM 不定义，开发会按技术视角埋点，后续做评测分析时会发现缺少关键业务字段。</div>
+
+  <h4>会话级记录（每次分析）</h4>
+  <table>
+    <tr><th>字段</th><th>类型</th><th>说明</th><th>用途</th></tr>
+    <tr><td><code>trace_id</code></td><td>string</td><td>自动生成</td><td>唯一标识一次分析</td></tr>
+    <tr><td><code>session_id</code></td><td>string</td><td>对话 session ID</td><td>串联多轮对话</td></tr>
+    <tr><td><code>user_id</code></td><td>string</td><td>用户标识</td><td>按用户统计质量</td></tr>
+    <tr><td><code>user_query</code></td><td>string</td><td>用户原始输入</td><td>评测回溯</td></tr>
+    <tr><td><code>trigger_type</code></td><td>enum</td><td>manual / scheduled / threshold</td><td>区分手动和自动</td></tr>
+    <tr><td><code>matched_skills</code></td><td>array</td><td>匹配到的技能名列表</td><td>技能匹配准确率统计</td></tr>
+    <tr><td><code>context_injected</code></td><td>object</td><td>本次注入的上下文（data_context + business_knowledge）</td><td>追踪上下文使用情况和准确性</td></tr>
+    <tr><td><code>total_steps</code></td><td>int</td><td>总步骤数</td><td>复杂度统计</td></tr>
+    <tr><td><code>result_type</code></td><td>enum</td><td>quick_answer / chart_panel / analysis_report</td><td>结果类型分布</td></tr>
+    <tr><td><code>total_duration_ms</code></td><td>int</td><td>总耗时（毫秒）</td><td>性能监控</td></tr>
+    <tr><td><code>tags</code></td><td>array</td><td>自定义标签（如「周报」「归因」）</td><td>筛选和分组</td></tr>
+  </table>
+
+  <h4>步骤级记录（每个分析步骤）</h4>
+  <table>
+    <tr><th>字段</th><th>类型</th><th>说明</th><th>用途</th></tr>
+    <tr><td><code>span_id</code></td><td>string</td><td>自动生成</td><td>唯一标识一个步骤</td></tr>
+    <tr><td><code>parent_trace_id</code></td><td>string</td><td>所属 Trace</td><td>层级关联</td></tr>
+    <tr><td><code>step_index</code></td><td>int</td><td>步骤序号（从 1 开始）</td><td>步骤顺序</td></tr>
+    <tr><td><code>step_label</code></td><td>string</td><td>步骤标签</td><td>按标签统计失败率</td></tr>
+    <tr><td><code>data_source</code></td><td>string</td><td>本步骤使用的数据表名</td><td>追踪多表使用情况</td></tr>
+    <tr><td><code>step_name</code></td><td>string</td><td>步骤名称（模型输出）</td><td>展示用</td></tr>
+    <tr><td><code>duration_ms</code></td><td>int</td><td>步骤耗时</td><td>性能分析</td></tr>
+    <tr><td><code>code_executed</code></td><td>string</td><td>执行的代码（如有）</td><td>Debug 和评测</td></tr>
+    <tr><td><code>output_summary</code></td><td>string</td><td>步骤输出摘要</td><td>快速浏览</td></tr>
+    <tr><td><code>artifacts</code></td><td>JSON</td><td>产出的 artifacts（type + data）</td><td>追踪图表输出</td></tr>
+    <tr><td><code>constraint_result</code></td><td>object</td><td>约束校验结果（pass/fail + 原因）</td><td>约束规则效果评估</td></tr>
+  </table>
+
+  <h4>模型调用级记录（每次 LLM 请求）</h4>
+  <table>
+    <tr><th>字段</th><th>类型</th><th>说明</th><th>用途</th></tr>
+    <tr><td><code>model</code></td><td>string</td><td>模型名称</td><td>模型成本分析</td></tr>
+    <tr><td><code>input_tokens</code></td><td>int</td><td>输入 token 数</td><td>成本统计</td></tr>
+    <tr><td><code>output_tokens</code></td><td>int</td><td>输出 token 数</td><td>成本统计</td></tr>
+    <tr><td><code>prompt_version</code></td><td>string</td><td>约束规则版本号</td><td>规则 A/B 对比</td></tr>
+  </table>
+
+  <div class="callout callout-info">
+    <strong>PM 交付的就是上面这三张表</strong>
+    核心是定义「在每个层级记录哪些字段，拿来做什么分析」。开发据此实现埋点。
+  </div> -->
+</div>
+
+<!-- S12: PM 交付物 + 风险 -->
+<div class="section" id="s12">
+  <h2>12 PM 交付物 + 风险</h2>
+  <h3>交付物</h3>
+  <table>
+    <tr><th>迭代</th><th>交付物</th></tr>
+    <tr><td rowspan="7"><span class="badge badge-primary">A</span></td><td>PRD + 交互稿</td></tr>
+    <tr><td>3-5 技能完整定义（名称+描述+分析步骤描述+参数+约束）</td></tr>
+    <tr><td>最小约束规则集（5 代码 + 5 Prompt）+ 步骤标签定义</td></tr>
+    <tr><td>三段式 UI 交互规范（Chat + Process + Artifacts）</td></tr>
+    <tr><td>上下文组装规范（数据提取规则 + 数据说明配置 + 透明展示交互）</td></tr>
+    <tr><td>可观测性数据规范（第 11 节）</td></tr>
+    <tr><td>评测集 v1：10 个场景 + 模拟数据</td></tr>
+    <tr><td rowspan="5"><span class="badge badge-success">B</span></td><td>基于评测迭代系统指令中的 Prompt 规则（逐条 ROI 验证后确定范围）</td></tr>
+    <tr><td>从对话生成技能 PRD + 技能编辑器交互规范</td></tr>
+    <tr><td>技能中心页面交互规范</td></tr>
+    <tr><td>约束规则 ROI 验证方案</td></tr>
+    <tr><td>评测集 v2：30 个场景</td></tr>
+    <tr><td rowspan="4"><span class="badge badge-purple">C</span></td><td>自动化 PRD（手动创建 + 从对话创建 + 定期执行 + 阈值触发 + 推送）</td></tr>
+    <tr><td>LLM-Judge Rubric（6 维度评分标准）</td></tr>
+    <tr><td>自动化回归测试方案</td></tr>
+    <tr><td>评测集 v3：50+ 场景</td></tr>
+  </table>
+
+  <h3>风险</h3>
+  <table>
+    <tr><th>风险</th><th>概率</th><th>应对</th></tr>
+    <tr><td>技能匹配不准</td><td><span class="badge badge-warning">中</span></td><td>优化 description + fallback 自由分析 + 用户纠正</td></tr>
+    <tr><td>三栏布局前端工作量</td><td><span class="badge badge-warning">中</span></td><td>Process/Artifacts 共用步骤数据源；优先 Process，Artifacts 渐进增强</td></tr>
+    <tr><td>上下文组装导致系统指令过长</td><td><span class="badge badge-warning">中</span></td><td>数据说明条目上限（迭代 A 限 20 条）+ 数据摘要化 + Token 预算管理</td></tr>
+    <tr><td>自动化执行结果不可信</td><td><span class="badge badge-danger">高</span></td><td>迭代 C 才上线自动化 + 自动校验兜底</td></tr>
+    <tr><td>迭代 A 范围大</td><td><span class="badge badge-warning">中</span></td><td>P1 可延后（可观测性埋点等），优先保证核心链路</td></tr>
+    <tr><td>DeerFlow 框架改造成本超预期</td><td><span class="badge badge-warning">中</span></td><td>提前做技术验证 + 备选方案</td></tr>
+    <tr><td>阈值触发误报率高</td><td><span class="badge badge-warning">中</span></td><td>迭代 C 做（依赖评测验证稳定性）+ 告警抑制策略</td></tr>
+  </table>
+</div>
+
+<!-- S13: 框架选型 -->
+<!-- <div class="section" id="s13">
+  <h2>13 技术框架与二期方向</h2>
+
+  <h3>13.1 一期技术框架</h3>
+  <p>一期基于 <strong>DeerFlow</strong> 开源 Agent 框架构建。DeerFlow 已具备多步执行、计划确认、Skill 系统、沙箱和流式输出等基础能力，与本方案的需求高度匹配。具体技术改造方案由研发团队评估后给出。</p>
+
+  <h3>13.2 二期方向：元数据平台集成（MCP）</h3>
+  <p>公司有统一数据管理平台（含星型模型、字段到指标的映射关系、维度层级等）。二期希望 Agent 能自动获取这些知识，推荐通过 MCP（Model Context Protocol）接入。</p>
+
+  <h4>为什么选 MCP</h4>
+  <table>
+    <tr><th>对比维度</th><th>传统 API 对接</th><th>MCP 协议</th></tr>
+    <tr><td>模型理解</td><td>开发写代码调 API，模型不感知数据模型</td><td>模型直接通过 MCP Tool 查询元数据，自主理解</td></tr>
+    <tr><td>灵活性</td><td>每新增一个数据源需改代码</td><td>新增 MCP Server 即可，Agent 侧无需改动</td></tr>
+    <tr><td>业界趋势</td><td>传统方式</td><td>dbt、OpenMetadata、DataHub、Atlan 均已发布 MCP Server</td></tr>
+    <tr><td>与 Agent 框架兼容</td><td>需要自定义适配</td><td>LangChain / LangGraph 原生支持 MCP Tool</td></tr>
+  </table>
+
+  <h4>业界 MCP Server 现状</h4>
+  <table>
+    <tr><th>平台</th><th>MCP Server 状态</th><th>适用场景</th></tr>
+    <tr><td>dbt</td><td>已发布</td><td>有 dbt 项目的团队</td></tr>
+    <tr><td>OpenMetadata</td><td>已发布</td><td>使用 OpenMetadata 做数据治理</td></tr>
+    <tr><td>DataHub</td><td>已发布</td><td>使用 DataHub 做数据目录</td></tr>
+    <tr><td>Atlan</td><td>已发布</td><td>使用 Atlan 做数据目录</td></tr>
+    <tr><td>自建平台</td><td>需自建 MCP Server</td><td>内部统一数据管理平台</td></tr>
+  </table>
+  <div class="callout callout-teal"><strong>一期不涉及 MCP 开发。</strong>一期的数据说明通过后台接口获取，二期根据元数据平台成熟度评估是否用 MCP 替代。具体技术方案由研发调研后决定。</div>
+</div> -->
+
+</div>
+
+<!-- Watermark -->
+<div id="watermark-layer" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden"></div>
+<script>
+(function(){
+  // Watermark
+  var c=document.createElement('canvas');c.width=320;c.height=220;
+  var ctx=c.getContext('2d');ctx.rotate(-25*Math.PI/180);ctx.font='16px sans-serif';
+  ctx.fillStyle='rgba(0,0,0,0.04)';ctx.fillText('luna',20,120);
+  ctx.font='12px sans-serif';ctx.fillStyle='rgba(0,0,0,0.03)';
+  ctx.fillText(new Date().toISOString().slice(0,10),20,142);
+  document.getElementById('watermark-layer').style.background='url('+c.toDataURL()+') repeat';
+
+  // Expiry: 30 days from now
+  var created=new Date('2026-04-09');
+  var expiry=new Date(created.getTime()+30*24*60*60*1000);
+  if(new Date()>expiry){
+    document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-size:24px;color:#999;font-family:sans-serif">此文档已过期（有效期至 '+expiry.toISOString().slice(0,10)+'）</div>';
+  } else {
+    var bar=document.createElement('div');
+    bar.style.cssText='position:fixed;top:0;left:0;right:0;background:#1e40af;color:#fff;padding:6px 16px;font-size:12px;z-index:10000;display:flex;justify-content:space-between;font-family:sans-serif';
+    document.body.prepend(bar);
+    document.querySelector('.page-container').style.paddingTop='60px';
+  }
+})();
+</script>
+</body>
+</html>
